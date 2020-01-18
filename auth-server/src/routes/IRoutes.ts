@@ -14,15 +14,6 @@ export abstract class IRoutes {
         });
     }
 
-    // private async log(ctx: any, next: any) {
-    //     ctx.logger = new Logger(ctx);
-    //     ctx.logger.request();
-    //     await next();
-    //     if (ctx.logger.logResponse) {
-    //         ctx.logger.response();
-    //     }
-    // }
-
     private registerRoute = (route: Route, router: Router) => {
         switch (route.method) {
             case ('get'):

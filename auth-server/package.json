@@ -10,6 +10,11 @@
   },
   "author": "Martin Lehtomaa",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/martinLeht/koa-passport-jwt-auth.git"
+  },
+
   "devDependencies": {
     "@types/node": "^13.1.8",
     "concurrently": "^5.0.2",
