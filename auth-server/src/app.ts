@@ -2,8 +2,11 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import logger from 'koa-logger';
 import Router from 'koa-router';
+import helmet = require("koa-helmet");
 import { IRouterContext } from 'koa-router';
 import { Inject } from 'typescript-ioc';
+import UsersRoutes from './routes/UsersRoutes';
+
 
 const cors = require('@koa/cors');
 
@@ -11,8 +14,7 @@ const cors = require('@koa/cors');
 export class App {
 
 
-    constructor() {
-
+    constructor(@Inject private usersRoutes: UsersRoutes) {
 
     }
 
@@ -20,6 +22,9 @@ export class App {
         const app: Koa = new Koa();
         const router: Router = new Router();
 
+        this.usersRoutes.register(router);
+
+        app.use(helmet());
         app.use(cors());
         app.use(logger());
         app.use(bodyParser({ jsonLimit: '5mb' }));

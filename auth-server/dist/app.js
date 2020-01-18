@@ -1,4 +1,16 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -43,9 +55,13 @@ var koa_1 = __importDefault(require("koa"));
 var koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
 var koa_logger_1 = __importDefault(require("koa-logger"));
 var koa_router_1 = __importDefault(require("koa-router"));
+var helmet = require("koa-helmet");
+var typescript_ioc_1 = require("typescript-ioc");
+var UsersRoutes_1 = __importDefault(require("./routes/UsersRoutes"));
 var cors = require('@koa/cors');
 var App = /** @class */ (function () {
-    function App() {
+    function App(usersRoutes) {
+        this.usersRoutes = usersRoutes;
     }
     App.prototype.createApp = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -54,6 +70,8 @@ var App = /** @class */ (function () {
             return __generator(this, function (_a) {
                 app = new koa_1.default();
                 router = new koa_router_1.default();
+                this.usersRoutes.register(router);
+                app.use(helmet());
                 app.use(cors());
                 app.use(koa_logger_1.default());
                 app.use(koa_bodyparser_1.default({ jsonLimit: '5mb' }));
@@ -100,6 +118,10 @@ var App = /** @class */ (function () {
             });
         });
     };
+    App = __decorate([
+        __param(0, typescript_ioc_1.Inject),
+        __metadata("design:paramtypes", [UsersRoutes_1.default])
+    ], App);
     return App;
 }());
 exports.App = App;
