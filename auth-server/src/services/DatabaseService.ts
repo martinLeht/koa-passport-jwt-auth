@@ -2,38 +2,21 @@ import { Singleton } from 'typescript-ioc';
 import { Request } from 'tedious';
 import tedious = require("tedious");
 import ConnectionPool from 'tedious-connection-pool';
-import { DATABASE } from '../Config/Config';
+import mysql, { Pool, PoolConnection, PoolConfig, MysqlError, FieldInfo }  from 'mysql';
+import fs from 'fs';
+import { dbPoolConfig } from '../Config/Config';
+import { rejects } from 'assert';
 
 @Singleton
 export default class DatabaseService {
 
-    private pool: ConnectionPool;
+    private pool2: Pool;
 
     constructor() {
 
-        const config: tedious.ConnectionConfig = {
-            server: "127.0.0.1",
-            options: {
-                database: "capstone_db",
-                instanceName: "exampledb"
-            },
-            authentication: {
-                type: 'default',
-                options: {
-                    userName: "exampledb",
-                    password: "exampledb"
-                }
-            }
-        };
-        
-        const poolConfig: ConnectionPool.PoolConfig = {
-            min: 1,
-            max: 4,
-            log: true,
-            acquireTimeout: 10000
-        };
-        
-        this.pool = new ConnectionPool(poolConfig, config);
+        let poolConf: PoolConfig = dbPoolConfig;
+
+        this.pool2 = mysql.createPool(poolConf);
     }
 
     /**
@@ -83,6 +66,49 @@ export default class DatabaseService {
         });
     }
 
+    public async find2(obj: { sql: string, columns: string[] }) {
+        return new Promise<any[]>((resolve, reject) => {
+            this.getConnection2().then(connection => {
+                // Use the connection
+                connection.query(obj.sql, (err: Error, rows: any[], fields: FieldInfo[]) => {
+                    if (err) {
+                        console.log(err);
+                        reject(err);
+
+                    } else {
+                        if (rows.length === 0) {
+                            resolve([]);
+                        } else {
+                            let result: any[] = [];
+                            console.log(rows);
+                            if (rows.length > 0) {
+                                for (let row of rows) {
+                                    console.log(row);
+                                    let item: any = {};
+                                    
+                                    obj.columns.forEach(column => {
+                                        item[column] = row[column];
+                                    });
+                                    
+                                    console.log("After parse:");
+                                    console.log(item);
+                                    result.push(item);
+                                }
+                            }
+                            console.log(result.length);
+                            console.log(result);
+                            resolve(result);
+                        }
+                    }
+                    // When done with the connection, release it.
+                    connection.release();
+
+                    // Don't use the connection here, it has been returned to the pool.
+                });
+            })
+        });
+    }
+
     public async getConnection() {
         console.log("In get connection");
         return new Promise<ConnectionPool.PooledConnection>((resolve, reject) => {
@@ -93,6 +119,22 @@ export default class DatabaseService {
                     reject(err);
                 } else {
                     console.log("Resolve getConnection()");
+                    resolve(connection);
+                } 
+            });
+        });
+    }
+
+    public async getConnection2() {
+        return new Promise<PoolConnection>((resolve, reject) => {
+            this.pool2.getConnection((err: MysqlError, connection: PoolConnection) => {
+                if (err) {
+                    console.log("Reject getConnection(): " + err);
+                    reject(err);
+                } else {
+                    console.log("Resolve getConnection()" + connection);
+                    console.log(connection.state)
+                    console.log(connection.threadId)
                     resolve(connection);
                 } 
             });
@@ -114,7 +156,6 @@ export default class DatabaseService {
                 if (column.metadata.type.name === 'BigInt' || column.metadata.type.name === 'IntN') {
                     return parseInt(column.value);
                 }
-
                 return column.value;
             }
         }

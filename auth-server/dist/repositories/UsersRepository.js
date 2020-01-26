@@ -55,7 +55,7 @@ var typescript_ioc_1 = require("typescript-ioc");
 var tedious_1 = require("tedious");
 var DatabaseService_1 = __importDefault(require("../services/DatabaseService"));
 var slugify = require('slugify');
-var SELECT_ALL = 'u.[Id], u.[username], u.[email], u.[password]';
+var SELECT_ALL = 'u.id, u.details_id, u.username, u.email, u.password';
 var COLUMNS = [
     'id', 'username', 'email', 'password'
 ];
@@ -65,19 +65,22 @@ var UsersRepository = /** @class */ (function () {
     }
     UsersRepository.prototype.findAll = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var users;
-            var _this = this;
+            var users, _i, users_1, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         console.log("In the repository FIND ALL");
-                        return [4 /*yield*/, this.db.find({
+                        return [4 /*yield*/, this.db.find2({
                                 sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
                                 columns: COLUMNS
                             })];
                     case 1:
                         users = _a.sent();
-                        return [2 /*return*/, users.map(function (user) { return _this.parse(user); })];
+                        for (_i = 0, users_1 = users; _i < users_1.length; _i++) {
+                            user = users_1[_i];
+                            console.log(user);
+                        }
+                        return [2 /*return*/, users];
                 }
             });
         });
@@ -89,7 +92,7 @@ var UsersRepository = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         console.log("In the repository FIND id");
-                        return [4 /*yield*/, this.db.find({
+                        return [4 /*yield*/, this.db.find2({
                                 sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u WHERE [username] = ' + id,
                                 columns: COLUMNS
                             })];
@@ -107,7 +110,7 @@ var UsersRepository = /** @class */ (function () {
             var users;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.db.find({
+                    case 0: return [4 /*yield*/, this.db.find2({
                             sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u ' +
                                 'WHERE [username] = \'' + username + '\'',
                             columns: COLUMNS
@@ -205,11 +208,11 @@ var UsersRepository = /** @class */ (function () {
         });
     };
     UsersRepository.prototype.parse = function (row) {
-        var username = JSON.parse(row.username);
+        console.log("IN PARSE");
+        console.log(row);
         return {
             id: row.id,
-            username: username,
-            slug: username && username.fi ? slugify(username.fi).toLowerCase() : '',
+            username: JSON.parse(row.username),
             email: JSON.parse(row.email),
             password: JSON.parse(row.password)
         };
