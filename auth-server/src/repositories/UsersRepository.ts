@@ -5,7 +5,7 @@ import DatabaseService from '../services/DatabaseService';
 var slugify = require('slugify');
 
 const SELECT_ALL = 
-    'u.[Id], u.[username], u.[email], u.[password]';
+    'u.id, u.details_id, u.username, u.email, u.password';
 
 const COLUMNS = [ 
     'id', 'username', 'email', 'password'
@@ -19,17 +19,20 @@ export default class UsersRepository {
 
     public async findAll() {
         console.log("In the repository FIND ALL");
-        const users = await this.db.find({
+        const users = await this.db.find2({
             sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
             columns: COLUMNS
         });
 
-        return users.map(user => this.parse(user));
+        for (let user of users) {
+            console.log(user);
+        }
+        return users;
     }
 
     public async findById(id: number) {
         console.log("In the repository FIND id");
-        const users = await this.db.find({
+        const users = await this.db.find2({
             sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u WHERE [username] = ' + id,
             columns: COLUMNS
         });
@@ -40,14 +43,14 @@ export default class UsersRepository {
     }
 
     public async findByUsername(username: string) {
-        const users = await this.db.find({
+        const users = await this.db.find2({
             sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u ' +
                  'WHERE [username] = \'' + username + '\'',
             columns: COLUMNS 
         });
 
         if (users.length === 0) return undefined;
-
+        
         return this.parse(users[0]);
     }
 
@@ -138,11 +141,11 @@ export default class UsersRepository {
     }
 
     private parse(row: any): any {
-        const username = JSON.parse(row.username);
+        console.log("IN PARSE");
+        console.log(row);
         return {
             id: row.id,
-            username: username,
-            slug: username && username.fi ? slugify(username.fi).toLowerCase() : '',
+            username: JSON.parse(row.username),
             email: JSON.parse(row.email),
             password: JSON.parse(row.password)
         };

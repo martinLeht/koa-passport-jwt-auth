@@ -50,30 +50,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typescript_ioc_1 = require("typescript-ioc");
 var tedious_1 = require("tedious");
-var tedious_connection_pool_1 = __importDefault(require("tedious-connection-pool"));
+var mysql_1 = __importDefault(require("mysql"));
+var Config_1 = require("../Config/Config");
 var DatabaseService = /** @class */ (function () {
     function DatabaseService() {
-        var config = {
-            server: "127.0.0.1",
-            options: {
-                database: "capstone_db",
-                instanceName: "exampledb"
-            },
-            authentication: {
-                type: 'default',
-                options: {
-                    userName: "exampledb",
-                    password: "exampledb"
-                }
-            }
-        };
-        var poolConfig = {
-            min: 1,
-            max: 4,
-            log: true,
-            acquireTimeout: 10000
-        };
-        this.pool = new tedious_connection_pool_1.default(poolConfig, config);
+        var poolConf = Config_1.dbPoolConfig;
+        this.pool2 = mysql_1.default.createPool(poolConf);
     }
     DatabaseService_1 = DatabaseService;
     /**
@@ -129,6 +111,55 @@ var DatabaseService = /** @class */ (function () {
             });
         });
     };
+    DatabaseService.prototype.find2 = function (obj) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        _this.getConnection2().then(function (connection) {
+                            // Use the connection
+                            connection.query(obj.sql, function (err, rows, fields) {
+                                if (err) {
+                                    console.log(err);
+                                    reject(err);
+                                }
+                                else {
+                                    if (rows.length === 0) {
+                                        resolve([]);
+                                    }
+                                    else {
+                                        var result = [];
+                                        console.log(rows);
+                                        if (rows.length > 0) {
+                                            var _loop_2 = function (row) {
+                                                console.log(row);
+                                                var item = {};
+                                                obj.columns.forEach(function (column) {
+                                                    item[column] = row[column];
+                                                });
+                                                console.log("After parse:");
+                                                console.log(item);
+                                                result.push(item);
+                                            };
+                                            for (var _i = 0, rows_2 = rows; _i < rows_2.length; _i++) {
+                                                var row = rows_2[_i];
+                                                _loop_2(row);
+                                            }
+                                        }
+                                        console.log(result.length);
+                                        console.log(result);
+                                        resolve(result);
+                                    }
+                                }
+                                // When done with the connection, release it.
+                                connection.release();
+                                // Don't use the connection here, it has been returned to the pool.
+                            });
+                        });
+                    })];
+            });
+        });
+    };
     DatabaseService.prototype.getConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -143,6 +174,27 @@ var DatabaseService = /** @class */ (function () {
                             }
                             else {
                                 console.log("Resolve getConnection()");
+                                resolve(connection);
+                            }
+                        });
+                    })];
+            });
+        });
+    };
+    DatabaseService.prototype.getConnection2 = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        _this.pool2.getConnection(function (err, connection) {
+                            if (err) {
+                                console.log("Reject getConnection(): " + err);
+                                reject(err);
+                            }
+                            else {
+                                console.log("Resolve getConnection()" + connection);
+                                console.log(connection.state);
+                                console.log(connection.threadId);
                                 resolve(connection);
                             }
                         });
