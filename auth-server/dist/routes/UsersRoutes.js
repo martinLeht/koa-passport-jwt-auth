@@ -43,10 +43,10 @@ var UsersRoutes = /** @class */ (function (_super) {
         var _this = this;
         return [
             Route_1.default.newRoute('/users', 'get', function (ctx) { return _this.usersController.getUsers(ctx); }, true),
-            Route_1.default.newRoute('/users', 'post', function (ctx) { return _this.usersController.saveUser(ctx); }),
+            Route_1.default.newRoute('/users', 'post', function (ctx) { return _this.usersController.saveUser(ctx); }, true),
             Route_1.default.newRoute('/users/:id', 'get', function (ctx) { return _this.usersController.getUser(ctx); }, true),
-            Route_1.default.newRoute('/users/:id', 'put', function (ctx) { return _this.usersController.modifyUser(ctx); }),
-            Route_1.default.newRoute('/users/:id', 'delete', function (ctx) { return _this.usersController.deleteUser(ctx); })
+            Route_1.default.newRoute('/users/:id', 'put', function (ctx) { return _this.usersController.modifyUser(ctx); }, true),
+            Route_1.default.newRoute('/users/:id', 'delete', function (ctx) { return _this.usersController.deleteUser(ctx); }, true)
         ];
     };
     UsersRoutes = __decorate([

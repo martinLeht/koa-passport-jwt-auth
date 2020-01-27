@@ -52,9 +52,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typescript_ioc_1 = require("typescript-ioc");
-var tedious_1 = require("tedious");
 var DatabaseService_1 = __importDefault(require("../services/DatabaseService"));
-var slugify = require('slugify');
 var SELECT_ALL = 'u.id, u.details_id, u.username, u.email, u.password';
 var COLUMNS = [
     'id', 'username', 'email', 'password'
@@ -68,12 +66,10 @@ var UsersRepository = /** @class */ (function () {
             var users, _i, users_1, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log("In the repository FIND ALL");
-                        return [4 /*yield*/, this.db.find2({
-                                sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
-                                columns: COLUMNS
-                            })];
+                    case 0: return [4 /*yield*/, this.db.find2({
+                            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
+                            columns: COLUMNS
+                        })];
                     case 1:
                         users = _a.sent();
                         for (_i = 0, users_1 = users; _i < users_1.length; _i++) {
@@ -90,36 +86,15 @@ var UsersRepository = /** @class */ (function () {
             var users;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log("In the repository FIND id");
-                        return [4 /*yield*/, this.db.find2({
-                                sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u WHERE [username] = ' + id,
-                                columns: COLUMNS
-                            })];
-                    case 1:
-                        users = _a.sent();
-                        if (users.length === 0)
-                            return [2 /*return*/, undefined];
-                        return [2 /*return*/, this.parse(users[0])];
-                }
-            });
-        });
-    };
-    UsersRepository.prototype.findByUsername = function (username) {
-        return __awaiter(this, void 0, void 0, function () {
-            var users;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
                     case 0: return [4 /*yield*/, this.db.find2({
-                            sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u ' +
-                                'WHERE [username] = \'' + username + '\'',
+                            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u WHERE id = ' + id,
                             columns: COLUMNS
                         })];
                     case 1:
                         users = _a.sent();
                         if (users.length === 0)
                             return [2 /*return*/, undefined];
-                        return [2 /*return*/, this.parse(users[0])];
+                        return [2 /*return*/, users[0]];
                 }
             });
         });
@@ -128,21 +103,23 @@ var UsersRepository = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                console.log("In the repository INSERT");
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        _this.db.getConnection().then(function (connection) {
-                            var sql = 'INSERT INTO Users VALUES (@username, @email, @password)';
-                            var request = new tedious_1.Request(sql, function (error, rowCount, rows) {
-                                if (error)
-                                    reject(error);
-                                else
-                                    resolve(rows[0][0].value);
+                        _this.db.getConnection2().then(function (connection) {
+                            var userData = [
+                                obj.username,
+                                obj.email,
+                                obj.password
+                            ];
+                            var sql = 'INSERT INTO Users (username, email, password) VALUES (?,?,?)';
+                            connection.query(sql, userData, function (err, result) {
+                                if (err) {
+                                    reject(err);
+                                }
+                                else {
+                                    resolve(result.insertId);
+                                }
                                 connection.release();
                             });
-                            request.addParameter('username', tedious_1.TYPES.NVarChar, JSON.stringify(obj.username));
-                            request.addParameter('email', tedious_1.TYPES.NVarChar, JSON.stringify(obj.email));
-                            request.addParameter('password', tedious_1.TYPES.NVarChar, JSON.stringify(obj.password));
-                            connection.execSql(request);
                         }).catch(function (err) {
                             throw new Error("Connection error: " + err);
                         });
@@ -153,14 +130,22 @@ var UsersRepository = /** @class */ (function () {
     UsersRepository.prototype.update = function (id, obj) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.db.getConnection().then(function (connection) {
-                var sql = 'UPDATE [dbo].[Users] SET ';
+            _this.db.getConnection2().then(function (connection) {
+                var userData = [];
                 if (obj.username !== undefined)
-                    sql += 'username = @username, ';
+                    userData.push(obj.username);
                 if (obj.email !== undefined)
-                    sql += 'email = @email, ';
+                    userData.push(obj.email);
                 if (obj.password !== undefined)
-                    sql += 'password = @password, ';
+                    userData.push(obj.password);
+                userData.push(id);
+                var sql = 'UPDATE Users SET ';
+                if (obj.username !== undefined)
+                    sql += 'username = ?, ';
+                if (obj.email !== undefined)
+                    sql += 'email = ?, ';
+                if (obj.password !== undefined)
+                    sql += 'password = ?, ';
                 if (sql.substr(-2) === ', ') {
                     sql = sql.substr(0, sql.length - 2);
                 }
@@ -169,41 +154,32 @@ var UsersRepository = /** @class */ (function () {
                     connection.release();
                     return;
                 }
-                sql += ' WHERE [Id] = @id ';
-                var request = new tedious_1.Request(sql, function (error, rowCount) {
-                    if (error)
-                        reject(error);
+                sql += ' WHERE id = ?';
+                connection.query(sql, userData, function (err, result) {
+                    if (err)
+                        reject(err);
                     else
                         resolve();
                     connection.release();
                 });
-                request.addParameter('id', tedious_1.TYPES.Int, id);
-                if (obj.username !== undefined)
-                    request.addParameter('username', tedious_1.TYPES.NVarChar, JSON.stringify(obj.username));
-                if (obj.email !== undefined)
-                    request.addParameter('email', tedious_1.TYPES.NVarChar, JSON.stringify(obj.email));
-                if (obj.password !== undefined)
-                    request.addParameter('password', tedious_1.TYPES.NVarChar, JSON.stringify(obj.password));
-                connection.execSql(request);
             });
         });
     };
     UsersRepository.prototype.delete = function (id) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.db.getConnection().then(function (connection) {
-                var sql = 'DELETE FROM [dbo].[Uses] WHERE [Id] = @id ';
-                var request = new tedious_1.Request(sql, function (error, rowCount) {
-                    if (error) {
-                        reject(error);
+            _this.db.getConnection2().then(function (connection) {
+                var sql = 'DELETE FROM Users WHERE id = ' + id;
+                connection.query(sql, function (err, result) {
+                    if (err) {
+                        reject(err);
                     }
                     else {
+                        console.log("Affected rows: " + result.affectedRows);
                         resolve();
                     }
                     connection.release();
                 });
-                request.addParameter('id', tedious_1.TYPES.Int, id);
-                connection.execSql(request);
             });
         });
     };

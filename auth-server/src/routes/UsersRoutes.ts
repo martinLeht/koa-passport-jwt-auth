@@ -13,10 +13,10 @@ export default class UsersRoutes extends IRoutes {
     protected getRoutes(): Route[] {
         return [
             Route.newRoute('/users', 'get', (ctx: IRouterContext) => this.usersController.getUsers(ctx), true),
-            Route.newRoute('/users', 'post', (ctx: IRouterContext) => this.usersController.saveUser(ctx)),
+            Route.newRoute('/users', 'post', (ctx: IRouterContext) => this.usersController.saveUser(ctx), true),
             Route.newRoute('/users/:id', 'get', (ctx: IRouterContext) => this.usersController.getUser(ctx), true),
-            Route.newRoute('/users/:id', 'put', (ctx: IRouterContext) => this.usersController.modifyUser(ctx)),
-            Route.newRoute('/users/:id', 'delete', (ctx: IRouterContext) => this.usersController.deleteUser(ctx))
+            Route.newRoute('/users/:id', 'put', (ctx: IRouterContext) => this.usersController.modifyUser(ctx), true),
+            Route.newRoute('/users/:id', 'delete', (ctx: IRouterContext) => this.usersController.deleteUser(ctx), true)
         ];
     }
 

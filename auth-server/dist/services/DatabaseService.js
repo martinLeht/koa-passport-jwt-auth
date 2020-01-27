@@ -129,7 +129,6 @@ var DatabaseService = /** @class */ (function () {
                                     }
                                     else {
                                         var result = [];
-                                        console.log(rows);
                                         if (rows.length > 0) {
                                             var _loop_2 = function (row) {
                                                 console.log(row);
@@ -137,8 +136,6 @@ var DatabaseService = /** @class */ (function () {
                                                 obj.columns.forEach(function (column) {
                                                     item[column] = row[column];
                                                 });
-                                                console.log("After parse:");
-                                                console.log(item);
                                                 result.push(item);
                                             };
                                             for (var _i = 0, rows_2 = rows; _i < rows_2.length; _i++) {
@@ -192,9 +189,7 @@ var DatabaseService = /** @class */ (function () {
                                 reject(err);
                             }
                             else {
-                                console.log("Resolve getConnection()" + connection);
-                                console.log(connection.state);
-                                console.log(connection.threadId);
+                                console.log("Resolve getConnection()");
                                 resolve(connection);
                             }
                         });

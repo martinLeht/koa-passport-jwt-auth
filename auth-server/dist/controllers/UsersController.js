@@ -131,6 +131,7 @@ var UsersController = /** @class */ (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
+                        console.log("In the controller UPDATE id");
                         id = parseInt(ctx.params.id);
                         data = ctx.request.body;
                         return [4 /*yield*/, this.usersRepository.findById(id)];
@@ -160,6 +161,7 @@ var UsersController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        console.log("In the controller DELETE id");
                         id = parseInt(ctx.params.id);
                         return [4 /*yield*/, this.usersRepository.findById(id)];
                     case 1:

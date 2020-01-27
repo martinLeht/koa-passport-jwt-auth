@@ -3,9 +3,7 @@ import { Request } from 'tedious';
 import tedious = require("tedious");
 import ConnectionPool from 'tedious-connection-pool';
 import mysql, { Pool, PoolConnection, PoolConfig, MysqlError, FieldInfo }  from 'mysql';
-import fs from 'fs';
 import { dbPoolConfig } from '../Config/Config';
-import { rejects } from 'assert';
 
 @Singleton
 export default class DatabaseService {
@@ -80,7 +78,6 @@ export default class DatabaseService {
                             resolve([]);
                         } else {
                             let result: any[] = [];
-                            console.log(rows);
                             if (rows.length > 0) {
                                 for (let row of rows) {
                                     console.log(row);
@@ -90,8 +87,6 @@ export default class DatabaseService {
                                         item[column] = row[column];
                                     });
                                     
-                                    console.log("After parse:");
-                                    console.log(item);
                                     result.push(item);
                                 }
                             }
@@ -132,9 +127,7 @@ export default class DatabaseService {
                     console.log("Reject getConnection(): " + err);
                     reject(err);
                 } else {
-                    console.log("Resolve getConnection()" + connection);
-                    console.log(connection.state)
-                    console.log(connection.threadId)
+                    console.log("Resolve getConnection()");
                     resolve(connection);
                 } 
             });
