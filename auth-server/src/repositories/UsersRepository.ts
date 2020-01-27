@@ -1,8 +1,5 @@
 import { Inject, Singleton } from 'typescript-ioc';
-import { Request, TYPES } from 'tedious';
 import DatabaseService from '../services/DatabaseService';
-
-var slugify = require('slugify');
 
 const SELECT_ALL = 
     'u.id, u.details_id, u.username, u.email, u.password';
@@ -18,7 +15,6 @@ export default class UsersRepository {
     constructor(@Inject private db: DatabaseService) { }
 
     public async findAll() {
-        console.log("In the repository FIND ALL");
         const users = await this.db.find2({
             sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
             columns: COLUMNS
@@ -31,27 +27,14 @@ export default class UsersRepository {
     }
 
     public async findById(id: number) {
-        console.log("In the repository FIND id");
         const users = await this.db.find2({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u WHERE [username] = ' + id,
+            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u WHERE id = ' + id,
             columns: COLUMNS
         });
 
         if (users.length === 0) return undefined;
 
-        return this.parse(users[0]);
-    }
-
-    public async findByUsername(username: string) {
-        const users = await this.db.find2({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM [dbo].[Users] u ' +
-                 'WHERE [username] = \'' + username + '\'',
-            columns: COLUMNS 
-        });
-
-        if (users.length === 0) return undefined;
-        
-        return this.parse(users[0]);
+        return users[0];
     }
 
     public async insert(obj: {
@@ -60,22 +43,25 @@ export default class UsersRepository {
         password: string
     }) {
 
-        console.log("In the repository INSERT");
         return new Promise<any>((resolve, reject) => {
-            this.db.getConnection().then(connection => {
-                let sql = 'INSERT INTO Users VALUES (@username, @email, @password)';
+            this.db.getConnection2().then(connection => {
+                const userData = [
+                    obj.username,
+                    obj.email,
+                    obj.password
+                ];
+                let sql = 'INSERT INTO Users (username, email, password) VALUES (?,?,?)';
 
-                let request = new Request(sql, (error: Error, rowCount: number, rows: any[]) => {
-                    if (error) reject(error);
-                    else resolve(rows[0][0].value);
+                connection.query(sql, userData, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } 
+                    else {
+                        resolve(result.insertId);
+                    } 
 
                     connection.release();
                 });
-
-                request.addParameter('username', TYPES.NVarChar, JSON.stringify(obj.username));
-                request.addParameter('email', TYPES.NVarChar, JSON.stringify(obj.email));
-                request.addParameter('password', TYPES.NVarChar, JSON.stringify(obj.password));
-                connection.execSql(request);
             }).catch((err) => {
                 throw new Error("Connection error: " + err); 
             });
@@ -88,11 +74,18 @@ export default class UsersRepository {
         password?: string
     }) {
         return new Promise<any>((resolve, reject) => {
-            this.db.getConnection().then(connection => {
-                let sql = 'UPDATE [dbo].[Users] SET ';
-                if (obj.username !== undefined) sql += 'username = @username, '; 
-                if (obj.email !== undefined) sql += 'email = @email, '; 
-                if (obj.password !== undefined) sql += 'password = @password, ';
+            this.db.getConnection2().then(connection => {
+                
+                const userData = [];
+                if (obj.username !== undefined) userData.push(obj.username);
+                if (obj.email !== undefined) userData.push(obj.email);
+                if (obj.password !== undefined) userData.push(obj.password);
+                userData.push(id);
+
+                let sql = 'UPDATE Users SET ';
+                if (obj.username !== undefined) sql += 'username = ?, '; 
+                if (obj.email !== undefined) sql += 'email = ?, '; 
+                if (obj.password !== undefined) sql += 'password = ?, ';
 
                 if (sql.substr(-2) === ', ') {
                     sql = sql.substr(0, sql.length - 2);
@@ -102,40 +95,33 @@ export default class UsersRepository {
                     return;
                 }
 
-                sql += ' WHERE [Id] = @id ';
+                sql += ' WHERE id = ?';
     
-                let request = new Request(sql, (error: Error, rowCount: number) => {
-                    if (error) reject(error);
+                connection.query(sql, userData, (err, result) => {
+                    if (err) reject(err);
                     else resolve();
 
                     connection.release();
                 });
-
-                request.addParameter('id', TYPES.Int, id);
-                if (obj.username !== undefined) request.addParameter('username', TYPES.NVarChar, JSON.stringify(obj.username));
-                if (obj.email !== undefined) request.addParameter('email', TYPES.NVarChar, JSON.stringify(obj.email));
-                if (obj.password !== undefined) request.addParameter('password', TYPES.NVarChar, JSON.stringify(obj.password));
-                connection.execSql(request);
             });
         });
     }
 
     public delete(id: number) {
         return new Promise<any>((resolve, reject) => {
-            this.db.getConnection().then(connection => {
-                let sql = 'DELETE FROM [dbo].[Uses] WHERE [Id] = @id ';
-                let request = new Request(sql, (error: Error, rowCount: number) => {
-                    if (error) {
-                        reject(error);
+            this.db.getConnection2().then(connection => {
+                let sql = 'DELETE FROM Users WHERE id = ' + id;
+
+                connection.query(sql, (err, result) => {
+                    if (err) {
+                        reject(err);
                     } else {
+                        console.log("Affected rows: " + result.affectedRows);
                         resolve();
                     }
     
                     connection.release();
-                });
-                
-                request.addParameter('id', TYPES.Int, id);
-                connection.execSql(request);                
+                });              
             });
         });
     }

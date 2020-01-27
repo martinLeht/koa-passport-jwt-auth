@@ -45,6 +45,7 @@ export default class UsersController {
     }
 
     public async modifyUser(ctx: IRouterContext) {
+        console.log("In the controller UPDATE id");
         const id = parseInt(ctx.params.id);
         const data = ctx.request.body;
 
@@ -61,10 +62,10 @@ export default class UsersController {
     }
 
     public async deleteUser(ctx: IRouterContext) {
+        console.log("In the controller DELETE id");
         const id = parseInt(ctx.params.id);
         const user = await this.usersRepository.findById(id);
-        if (!user)
-            ctx.throw(404);
+        if (!user) ctx.throw(404);
         
         await this.usersRepository.delete(id);
 

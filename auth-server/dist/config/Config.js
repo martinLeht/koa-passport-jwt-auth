@@ -13,14 +13,23 @@ exports.DATABASE = {
         database: 'capstone_db',
     }
 };
+// USE THIS
 exports.dbPoolConfig = {
     connectionLimit: 5,
     host: 'hoodscapstone.mysql.database.azure.com',
     user: 'hoodsadmin@hoodscapstone',
-    password: 'admin666!',
+    password: 'adminUser!666',
     database: 'capstonedb',
     port: 3306,
     ssl: {
         ca: fs_1.default.readFileSync(__dirname + '\\certificates\\BaltimoreCyberTrustRoot.crt.pem')
     }
+};
+exports.localDbPoolConfig = {
+    connectionLimit: 5,
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'capstone',
+    database: 'capstonedb',
+    port: 3308
 };
