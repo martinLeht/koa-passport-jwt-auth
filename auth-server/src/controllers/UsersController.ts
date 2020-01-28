@@ -1,6 +1,7 @@
 import { IRouterContext } from 'koa-router';
 import { Inject, Singleton } from 'typescript-ioc';
 import UsersRepository from '../repositories/UsersRepository';
+import bcryptjs from 'bcryptjs';
 import { createWriteStream } from 'fs';
 
 
@@ -23,6 +24,10 @@ export default class UsersController {
         if (!data || !data.username || !data.email || !data.password)
             ctx.throw(400);
         
+        const hash = await this.hashPassword(data.password);
+        console.log(hash);
+        data.password = hash;
+
         const id = await this.usersRepository.insert(data);
 
         ctx.body = {
@@ -70,5 +75,17 @@ export default class UsersController {
         await this.usersRepository.delete(id);
 
         ctx.body = { error: null };
+    }
+
+    private async hashPassword(password: string) {
+        return new Promise<any>((resolve, reject) => {
+            bcryptjs.genSalt(10)
+                    .then(salt => {
+                        bcryptjs.hash(password, salt)
+                                .then(hash => resolve(hash))
+                                .catch(err => reject(err))
+                    })
+                    .catch(err => reject(err))
+        });
     }
 }
