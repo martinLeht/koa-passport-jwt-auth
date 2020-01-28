@@ -24,45 +24,6 @@ export default class DatabaseService {
      * @param columns List of columns to include in the result objects
      * @returns Array of objects read from the database
      */
-    public async find(obj: { sql: string, columns: string[] }) {
-        console.log("In database service before promise");
-        return new Promise<any[]>((resolve, reject) => {
-            this.getConnection().then(connection => {
-                console.log('Getting connection!');
-                let request = new Request(obj.sql, (error: Error, rowCount: number, rows: any[]) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        if (rows.length === 0) {
-                            resolve([]);
-                        } else {
-                            let result: any[] = [];
-                            if (rows.length > 0) {
-                                for (let row of rows) {
-                                    let item: any = {};
-                                    obj.columns.forEach(column => {
-                                        item[column] = DatabaseService.getValue(column, row);
-                                    });
-
-                                    result.push(item);
-                                }
-                            }
-            
-                            resolve(result);
-                        }
-                    }
-    
-                    connection.release();
-                });
-    
-                connection.execSql(request);
-            }, error => {
-                reject(error);
-            }).catch((err) => {
-                throw new Error("Connection error: " + err); 
-            });
-        });
-    }
 
     public async find2(obj: { sql: string, columns: string[] }) {
         return new Promise<any[]>((resolve, reject) => {
@@ -101,22 +62,6 @@ export default class DatabaseService {
                     // Don't use the connection here, it has been returned to the pool.
                 });
             })
-        });
-    }
-
-    public async getConnection() {
-        console.log("In get connection");
-        return new Promise<ConnectionPool.PooledConnection>((resolve, reject) => {
-            console.log("In get connection Promise");
-            this.pool.acquire((err: Error, connection: ConnectionPool.PooledConnection) => {
-                if (err) {
-                    console.log("Reject getConnection(): " + err);
-                    reject(err);
-                } else {
-                    console.log("Resolve getConnection()");
-                    resolve(connection);
-                } 
-            });
         });
     }
 
