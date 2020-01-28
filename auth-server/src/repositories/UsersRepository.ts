@@ -15,7 +15,7 @@ export default class UsersRepository {
     constructor(@Inject private db: DatabaseService) { }
 
     public async findAll() {
-        const users = await this.db.find2({
+        const users = await this.db.find({
             sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
             columns: COLUMNS
         });
@@ -27,7 +27,7 @@ export default class UsersRepository {
     }
 
     public async findById(id: number) {
-        const users = await this.db.find2({
+        const users = await this.db.find({
             sql: 'SELECT ' + SELECT_ALL + ' FROM Users u WHERE id = ' + id,
             columns: COLUMNS
         });
@@ -44,7 +44,7 @@ export default class UsersRepository {
     }) {
 
         return new Promise<any>((resolve, reject) => {
-            this.db.getConnection2().then(connection => {
+            this.db.getConnection().then(connection => {
                 const userData = [
                     obj.username,
                     obj.email,
@@ -74,7 +74,7 @@ export default class UsersRepository {
         password?: string
     }) {
         return new Promise<any>((resolve, reject) => {
-            this.db.getConnection2().then(connection => {
+            this.db.getConnection().then(connection => {
                 
                 const userData = [];
                 if (obj.username !== undefined) userData.push(obj.username);
@@ -109,7 +109,8 @@ export default class UsersRepository {
 
     public delete(id: number) {
         return new Promise<any>((resolve, reject) => {
-            this.db.getConnection2().then(connection => {
+            this.db.getConnection
+            ().then(connection => {
                 let sql = 'DELETE FROM Users WHERE id = ' + id;
 
                 connection.query(sql, (err, result) => {

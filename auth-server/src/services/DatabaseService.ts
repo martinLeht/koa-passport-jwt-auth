@@ -25,9 +25,9 @@ export default class DatabaseService {
      * @returns Array of objects read from the database
      */
 
-    public async find2(obj: { sql: string, columns: string[] }) {
+    public async find(obj: { sql: string, columns: string[] }) {
         return new Promise<any[]>((resolve, reject) => {
-            this.getConnection2().then(connection => {
+            this.getConnection().then(connection => {
                 // Use the connection
                 connection.query(obj.sql, (err: Error, rows: any[], fields: FieldInfo[]) => {
                     if (err) {
@@ -65,7 +65,7 @@ export default class DatabaseService {
         });
     }
 
-    public async getConnection2() {
+    public async getConnection() {
         return new Promise<PoolConnection>((resolve, reject) => {
             this.pool2.getConnection((err: MysqlError, connection: PoolConnection) => {
                 if (err) {
