@@ -1,14 +1,16 @@
-import { IRouterContext } from 'koa-router';
-import { Inject, Singleton } from 'typescript-ioc';
+import {IRouterContext} from 'koa-router';
+import {Inject, Singleton} from 'typescript-ioc';
 import UsersRepository from '../repositories/UsersRepository';
 import bcryptjs from 'bcryptjs';
-import { createWriteStream } from 'fs';
+import {createWriteStream} from 'fs';
+import HelperService from "../services/HelperService";
 
 
 @Singleton
 export default class UsersController {
 
-    constructor(@Inject private usersRepository: UsersRepository) { }
+    constructor(@Inject private usersRepository: UsersRepository, @Inject private helperService: HelperService) {
+    }
 
     public async getUsers(ctx: IRouterContext) {
         console.log("In the controller GET ALL");
@@ -22,11 +24,18 @@ export default class UsersController {
         console.log("In the controller SAVE");
         const data = ctx.request.body;
         if (!data || !data.username || !data.email || !data.password)
-            ctx.throw(400);
-        
-        const hash = await this.hashPassword(data.password);
+            ctx.throw('Missing fields', 400);
+
+
+        const userExists = await this.usersRepository.findByEmail(data.email);
+
+        if (userExists) ctx.throw('Username already exists', 409);
+
+
+        const hash = await this.helperService.hashPassword(data.password);
         console.log(hash);
         data.password = hash;
+
 
         const id = await this.usersRepository.insert(data);
 
@@ -66,26 +75,16 @@ export default class UsersController {
         };
     }
 
+
     public async deleteUser(ctx: IRouterContext) {
         console.log("In the controller DELETE id");
         const id = parseInt(ctx.params.id);
         const user = await this.usersRepository.findById(id);
         if (!user) ctx.throw(404);
-        
+
         await this.usersRepository.delete(id);
 
-        ctx.body = { error: null };
+        ctx.body = {error: null};
     }
 
-    private async hashPassword(password: string) {
-        return new Promise<any>((resolve, reject) => {
-            bcryptjs.genSalt(10)
-                    .then(salt => {
-                        bcryptjs.hash(password, salt)
-                                .then(hash => resolve(hash))
-                                .catch(err => reject(err))
-                    })
-                    .catch(err => reject(err))
-        });
-    }
 }
