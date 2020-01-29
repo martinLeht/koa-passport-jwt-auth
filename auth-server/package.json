@@ -2,11 +2,11 @@
   "name": "auth-server",
   "version": "1.0.0",
   "description": "Serverside for the authentication.",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
-    "start:dev": "nodemon dist/server.js",
+    "start:dev": "nodemon src/server.ts",
     "build:dev": "tsc --watch --preserveWatchOutput",
-    "start": "node dist/server.js",
+    "start": "npx ts-node src/server.ts",
     "dev": "concurrently \"npm:build:dev\" \"npm:start:dev\""
   },
   "author": "Martin Lehtomaa",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@koa/cors": "^3.0.0",
+    "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^8.3.6",
     "@types/koa": "^2.11.0",
     "@types/koa-bodyparser": "^4.3.0",
@@ -27,6 +28,7 @@
     "@types/node": "^13.1.8",
     "@types/tedious": "^4.0.0",
     "@types/tedious-connection-pool": "^1.0.2",
+    "bcryptjs": "^2.4.3",
     "concurrently": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
