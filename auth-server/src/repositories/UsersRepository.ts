@@ -1,10 +1,10 @@
-import { Inject, Singleton } from 'typescript-ioc';
+import {Inject, Singleton} from 'typescript-ioc';
 import DatabaseService from '../services/DatabaseService';
 
-const SELECT_ALL = 
+const SELECT_ALL =
     'u.id, u.details_id, u.username, u.email, u.password';
 
-const COLUMNS = [ 
+const COLUMNS = [
     'id', 'username', 'email', 'password'
 ];
 
@@ -12,7 +12,8 @@ const COLUMNS = [
 @Singleton
 export default class UsersRepository {
 
-    constructor(@Inject private db: DatabaseService) { }
+    constructor(@Inject private db: DatabaseService) {
+    }
 
     public async findAll() {
         const users = await this.db.find({
@@ -37,6 +38,29 @@ export default class UsersRepository {
         return users[0];
     }
 
+
+    public async findByEmail(email: string) {
+
+        return new Promise<any>((resolve, reject) => {
+            this.db.getConnection().then(connection => {
+                const sql = 'SELECT * FROM users WHERE email = ?';
+
+                connection.query(sql, email, (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result[0]);
+
+                    }
+
+                    connection.release();
+                });
+            }).catch((err) => {
+                throw new Error("Connection error: " + err);
+            });
+        });
+    }
+
     public async insert(obj: {
         username: string,
         email: string,
@@ -55,27 +79,26 @@ export default class UsersRepository {
                 connection.query(sql, userData, (err, result) => {
                     if (err) {
                         reject(err);
-                    } 
-                    else {
+                    } else {
                         resolve(result.insertId);
-                    } 
+                    }
 
                     connection.release();
                 });
             }).catch((err) => {
-                throw new Error("Connection error: " + err); 
+                throw new Error("Connection error: " + err);
             });
         });
     }
 
-    public update(id: number, obj: { 
-        username?: string, 
-        email?: string, 
+    public update(id: number, obj: {
+        username?: string,
+        email?: string,
         password?: string
     }) {
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection().then(connection => {
-                
+
                 const userData = [];
                 if (obj.username !== undefined) userData.push(obj.username);
                 if (obj.email !== undefined) userData.push(obj.email);
@@ -83,8 +106,8 @@ export default class UsersRepository {
                 userData.push(id);
 
                 let sql = 'UPDATE Users SET ';
-                if (obj.username !== undefined) sql += 'username = ?, '; 
-                if (obj.email !== undefined) sql += 'email = ?, '; 
+                if (obj.username !== undefined) sql += 'username = ?, ';
+                if (obj.email !== undefined) sql += 'email = ?, ';
                 if (obj.password !== undefined) sql += 'password = ?, ';
 
                 if (sql.substr(-2) === ', ') {
@@ -96,7 +119,7 @@ export default class UsersRepository {
                 }
 
                 sql += ' WHERE id = ?';
-    
+
                 connection.query(sql, userData, (err, result) => {
                     if (err) reject(err);
                     else resolve();
@@ -120,9 +143,9 @@ export default class UsersRepository {
                         console.log("Affected rows: " + result.affectedRows);
                         resolve();
                     }
-    
+
                     connection.release();
-                });              
+                });
             });
         });
     }
