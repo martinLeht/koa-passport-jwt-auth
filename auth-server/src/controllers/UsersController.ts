@@ -1,9 +1,8 @@
 import {IRouterContext} from 'koa-router';
 import {Inject, Singleton} from 'typescript-ioc';
 import UsersRepository from '../repositories/UsersRepository';
-import bcryptjs from 'bcryptjs';
-import {createWriteStream} from 'fs';
 import HelperService from "../services/HelperService";
+import passport from "koa-passport";
 
 
 @Singleton
@@ -11,6 +10,17 @@ export default class UsersController {
 
     constructor(@Inject private usersRepository: UsersRepository, @Inject private helperService: HelperService) {
     }
+
+
+    public async loginUser(ctx: IRouterContext) {
+        console.log("In the controller loginUser");
+        console.log(ctx.request.body)
+        return passport.authenticate('local', { session: false }, async (err, user) => {
+        });
+    }
+
+
+
 
     public async getUsers(ctx: IRouterContext) {
         console.log("In the controller GET ALL");

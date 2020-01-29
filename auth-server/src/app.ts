@@ -2,19 +2,20 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import logger from 'koa-logger';
 import Router from 'koa-router';
+import passport from "koa-passport";
 import helmet = require("koa-helmet");
-import { IRouterContext } from 'koa-router';
-import { Inject } from 'typescript-ioc';
+import {IRouterContext} from 'koa-router';
+import {Inject} from 'typescript-ioc';
 import UsersRoutes from './routes/UsersRoutes';
+import PassportConfig from "./config/PassportConfig";
 
 
 const cors = require('@koa/cors');
 
-
 export class App {
 
 
-    constructor(@Inject private usersRoutes: UsersRoutes) {
+    constructor(@Inject private usersRoutes: UsersRoutes, @Inject private passportConfig: PassportConfig) {
 
     }
 
@@ -22,18 +23,31 @@ export class App {
         const app: Koa = new Koa();
         const router: Router = new Router();
 
-        this.usersRoutes.register(router);
+        await this.passportConfig.initializePassportConfig();
+
+        app.keys = ['your-session-secret'];
 
         app.use(helmet());
         app.use(cors());
         app.use(logger());
-        app.use(bodyParser({ jsonLimit: '5mb' }));
+        app.use(bodyParser({jsonLimit: '5mb'}));
+        app.use(passport.initialize())
+        app.use(passport.session())
+
+        this.usersRoutes.register(router);
+
+        // router.post('/login',
+        //     passport.authenticate('local', async (err, user) => {
+        //         console.log('HELLOOO');
+        //     }));
+
+
         app.use(async (ctx: IRouterContext, next: () => Promise<any>) => {
             try {
                 await next();
             } catch (err) {
                 ctx.status = err.status || 500;
-                ctx.body = { 
+                ctx.body = {
                     error: err.message
                 };
             }
