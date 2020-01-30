@@ -77,7 +77,8 @@ export default class UsersController {
     public async getUser(ctx: IRouterContext) {
         console.log("In the controller GET id");
         const id = parseInt(ctx.params.id);
-        const user = await this.usersRepository.findById(id);
+        let user = await this.usersRepository.findById(id);
+        
         if (!user)
             ctx.throw(404);
 
