@@ -40,25 +40,14 @@ export default class UsersRepository {
 
 
     public async findByEmail(email: string) {
+        const users = await this.db.find({
+            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u WHERE u.email = \"' + email + '\"',
+            columns: COLUMNS
+        })
 
-        return new Promise<any>((resolve, reject) => {
-            this.db.getConnection().then(connection => {
-                const sql = 'SELECT * FROM users WHERE email = ?';
+        if (users.length === 0) return undefined;
 
-                connection.query(sql, email, (err, result) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(result[0]);
-
-                    }
-
-                    connection.release();
-                });
-            }).catch((err) => {
-                throw new Error("Connection error: " + err);
-            });
-        });
+        return users[0];
     }
 
     public async insert(obj: {
