@@ -7,7 +7,6 @@ import UsersRepository from "../repositories/UsersRepository";
 
 const LocalStrategy = passportLocal.Strategy;
 
-
 @Singleton
 export default class PassportConfig {
     constructor(@Inject private usersRepository: UsersRepository) {
@@ -16,40 +15,34 @@ export default class PassportConfig {
 
     public async initializePassportConfig() {
 
-        console.log('initializePassport')
-        const authenticateUser = async (email: string, password: string, done: any) => {
-            const user: User = await this.usersRepository.findByEmail(email);
-            if (!user) {
-                return done(null, false);
-            }
+        passport.use(
+            'login',
+            new LocalStrategy({
+                usernameField: 'username',
+                passwordField: 'password',
+                session: false,
+            }, async (email, password, done) => {
 
-            try {
-                if (await bcryptjs.compare(password, user.password)) {
-                    console.log('password is valid')
-                    return done(null, user);
-
-                } else {
-                    console.log('password is incorrect')
-                    return done(null, false)
+                const user: User = await this.usersRepository.findByEmail(email);
+                if (!user) {
+                    return done(null, false);
                 }
-            } catch (e) {
-                return done(e);
-
-            }
 
 
-        };
+                try {
+                    if (await bcryptjs.compare(password, user.password)) {
+                        console.log('password is valid');
+                        return done(null, user);
 
+                    } else {
+                        console.log('password is incorrect');
+                        return done(null, false)
+                    }
+                } catch (e) {
+                    return done(e);
 
-        passport.use(new LocalStrategy({usernameField: 'email'}, authenticateUser));
-        passport.serializeUser((user: User, done: any) => {
-            console.log('serializeUser')
-            return done(null, user.id);
-        });
-        passport.deserializeUser((id: any, done: any) => {
-            console.log('deserializeUser')
-           return done(null, null);
-        });
+                }
+            }));
     }
 
 }

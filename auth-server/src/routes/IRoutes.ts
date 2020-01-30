@@ -1,7 +1,8 @@
 import * as Router from 'koa-router';
 import Jwt from 'koa-jwt';
-import * as Conf from '../config/Config';
+import {JWT_SECRET} from '../Config/Config';
 import Route from '../models/Route';
+
 
 export abstract class IRoutes {
 
@@ -19,28 +20,29 @@ export abstract class IRoutes {
                 if (route.open) {
                     router.get(route.path, route.action);
                 } else {
-                    router.get(route.path, Jwt({ secret: Conf.SECRET }), route.action);
+                    router.get(route.path, Jwt({secret: JWT_SECRET}), route.action);
                 }
+
                 break;
             case ('post'):
                 if (route.open) {
                     router.post(route.path, route.action);
                 } else {
-                    router.post(route.path, Jwt({ secret: Conf.SECRET }), route.action);
+                    router.post(route.path, Jwt({secret: JWT_SECRET}), route.action);
                 }
                 break;
             case ('put'):
                 if (route.open) {
                     router.put(route.path, route.action);
                 } else {
-                    router.put(route.path, Jwt({ secret: Conf.SECRET }), route.action);
+                    router.put(route.path, Jwt({secret: JWT_SECRET}), route.action);
                 }
                 break;
             case ('delete'):
                 if (route.open) {
                     router.delete(route.path, route.action);
                 } else {
-                    router.delete(route.path, Jwt({ secret: Conf.SECRET }), route.action);
+                    router.delete(route.path, Jwt({secret: JWT_SECRET}), route.action);
                 }
                 break;
         }
