@@ -1,13 +1,13 @@
-import { IRouterContext } from "koa-router";
+import {IRouterContext} from "koa-router";
 
 export default class Route {
 
     private _path!: string;
     private _method!: string;
-    private _action!: (ctx: IRouterContext) => void;
+    private _action!: (ctx: IRouterContext, next?: any) => void;
     private _open!: boolean;
 
-    public static newRoute(path: string, method: string, action: (ctx: IRouterContext) => void, open: boolean = false) {
+    public static newRoute(path: string, method: string, action: (ctx: IRouterContext, next?: any) => void, open: boolean = false) {
         const route = new Route();
         route._path = path;
         route._method = method;
@@ -24,7 +24,7 @@ export default class Route {
         return this._method;
     }
 
-    public get action(): (ctx: IRouterContext) => void {
+    public get action(): (ctx: IRouterContext, next?: any) => void {
         return this._action;
     }
 

@@ -51,8 +51,6 @@ export default class DatabaseService {
                                     result.push(item);
                                 }
                             }
-                            console.log(result.length);
-                            console.log(result);
                             resolve(result);
                         }
                     }

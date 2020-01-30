@@ -22,8 +22,10 @@ export class App {
     private async createApp() {
         const app: Koa = new Koa();
         const router: Router = new Router();
-
         await this.passportConfig.initializePassportConfig();
+        this.usersRoutes.register(router);
+
+
 
         app.keys = ['your-session-secret'];
 
@@ -31,15 +33,8 @@ export class App {
         app.use(cors());
         app.use(logger());
         app.use(bodyParser({jsonLimit: '5mb'}));
-        app.use(passport.initialize())
-        app.use(passport.session())
+        app.use(passport.initialize());
 
-        this.usersRoutes.register(router);
-
-        // router.post('/login',
-        //     passport.authenticate('local', async (err, user) => {
-        //         console.log('HELLOOO');
-        //     }));
 
 
         app.use(async (ctx: IRouterContext, next: () => Promise<any>) => {
