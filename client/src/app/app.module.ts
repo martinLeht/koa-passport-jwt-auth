@@ -8,7 +8,8 @@ import { UserInformationComponent } from './userinformation/userinformation.comp
 import { ProfileComponent } from './profile/profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import {MatMenuModule} from '@angular/material/menu';
+//Material imports
+import { MatMenuModule } from '@angular/material/';
 
 @NgModule({
   declarations: [
