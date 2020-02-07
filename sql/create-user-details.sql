@@ -19,13 +19,12 @@ CREATE TABLE Users (
     `username` VARCHAR(100) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
     `password` VARCHAR(100) NOT NULL,
+	`activationToken` VARCHAR(24),
+	`active` BOOLEAN NOT NULL DEFAULT 0,
     PRIMARY KEY (id),
     CONSTRAINT FK_UserDetails FOREIGN KEY (details_id)
     REFERENCES UserDetails(details_id)
     ON DELETE CASCADE
 );
-
-INSERT INTO Users (username, email, password) VALUES ('Saitama', 'saitama@opm.com', 'test666');
-INSERT INTO Users (username, email, password) VALUES ('Frodo', 'frodo.baggins@lotr.com', 'test666');
 
 SELECT * FROM Users;

@@ -1,9 +1,0 @@
-
-> auth-server@1.0.0 start C:\Users\marti\Desktop\Programing yms\JavaScript\hoods-capstone\auth-server
-> npm run build && node dist/server.js
-
-
-> auth-server@1.0.0 build C:\Users\marti\Desktop\Programing yms\JavaScript\hoods-capstone\auth-server
-> rimraf ./dist && tsc
-
-HELLO SERVER!
