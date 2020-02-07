@@ -18,7 +18,7 @@ export default class PassportConfig {
         passport.use(
             'login',
             new LocalStrategy({
-                usernameField: 'username',
+                usernameField: 'email',
                 passwordField: 'password',
                 session: false,
             }, async (email, password, done) => {
