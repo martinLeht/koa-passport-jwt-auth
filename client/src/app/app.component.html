@@ -1,10 +1,12 @@
 <!-- Global page content -->
-<nav><h1>Hoods Login</h1>
-  <button routerLink="/login" routerLinkActive="active">Login</button> |
-  <button routerLink="/register" routerLinkActive="active">Register</button> |
-  <button routerLink="/info" routerLinkActive="active">Info</button> |
-  <button routerLink="/profile" routerLinkActive="active">Profile</button>
-</nav> 
+
+<button mat-button [matMenuTriggerFor]="menu">Test</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item routerLink="/login" routerLinkActive="active">Login</button>
+  <button mat-menu-item routerLink="/register" routerLinkActive="active">Register</button>
+  <button mat-menu-item routerLink="/userinformation" routerLinkActive="active">Additional Info</button>
+  <button mat-menu-item routerLink="/profile" routerLinkActive="active">Profile</button>
+</mat-menu>
 
 <!-- Here we will load the current view: -->
 <router-outlet></router-outlet>
