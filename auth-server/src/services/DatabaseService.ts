@@ -1,7 +1,4 @@
 import { Singleton } from 'typescript-ioc';
-import { Request } from 'tedious';
-import tedious = require("tedious");
-import ConnectionPool from 'tedious-connection-pool';
 import mysql, { Pool, PoolConnection, PoolConfig, MysqlError, FieldInfo }  from 'mysql';
 import { dbPoolConfig } from '../Config/Config';
 
@@ -67,10 +64,8 @@ export default class DatabaseService {
         return new Promise<PoolConnection>((resolve, reject) => {
             this.pool2.getConnection((err: MysqlError, connection: PoolConnection) => {
                 if (err) {
-                    console.log("Reject getConnection(): " + err);
                     reject(err);
                 } else {
-                    console.log("Resolve getConnection()");
                     resolve(connection);
                 } 
             });
