@@ -1,0 +1,15 @@
+@import '../styles.scss';
+
+nav{
+    width: 100%;
+    display: inline-flex;
+    height: 75px;
+    background-color: $hoods-gray-color;
+}
+button{
+    max-width: 100%;
+    display: inline-flex;
+    margin: auto;
+    width: 20%;
+    background-color: $hoods-title-color;
+}
