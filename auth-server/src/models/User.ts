@@ -4,4 +4,6 @@ export default class User {
     username!: string;
     email!: string;
     password!: string;
+    activationToken!: string;
+    active!: boolean;
 }
