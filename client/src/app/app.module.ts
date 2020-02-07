@@ -7,6 +7,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { UserInformationComponent } from './userinformation/userinformation.component';
 import { ProfileComponent } from './profile/profile.component';
+import { LoginRoutingModule } from './login/login-routing.module';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { ProfileComponent } from './profile/profile.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
