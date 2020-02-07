@@ -6,14 +6,20 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../Config/Config';
 import passport from "koa-passport";
 import User from "../models/User";
-import {ExtendableContext, Next} from "koa";
+import { TokenGenerator } from 'ts-token-generator';
+import { Next} from "koa";
+import { EmailService } from '../services/EmailService';
+import { URL } from 'url';
 
 
 
 @Singleton
 export default class UsersController {
 
-    constructor(@Inject private usersRepository: UsersRepository, @Inject private helperService: HelperService) {
+    constructor(@Inject private usersRepository: UsersRepository,
+                @Inject private helperService: HelperService,
+                @Inject private emailService: EmailService,
+                @Inject private tokenGenerator: TokenGenerator) {
     }
 
 
@@ -29,13 +35,27 @@ export default class UsersController {
 
         data.password = await this.helperService.hashPassword(data.password);
 
-        const id = await this.usersRepository.insert(data);
+        const activationToken = this.tokenGenerator.generate();
+        console.log("Generated token: " + activationToken);
 
+        data.activationToken = activationToken;
+        data.active = false;
+
+        const id = await this.usersRepository.insert(data);
+        const response = await this.emailService.sendEmailVerification(data.email, activationToken, id);
 
         const {password, ...result} = await this.usersRepository.findById(id);
-        ctx.body = {
-            user: result
-        };
+        if (response['error']) {
+            ctx.body = {
+                error: response['error'],
+                user: result
+            };
+        } else {
+            ctx.body = {
+                success: response['success'],
+                user: result
+            };
+        }
     }
 
     public async loginUser(ctx: IRouterContext, next: Next) {
@@ -93,14 +113,15 @@ export default class UsersController {
         const id = parseInt(ctx.params.id);
         const data = ctx.request.body;
 
-        const user = await this.usersRepository.findById(id);
+        let user = await this.usersRepository.findById(id);
         if (!user)
             ctx.throw(404);
 
         await this.usersRepository.update(id, data);
-
+        user = await this.usersRepository.findById(id);
+        const {password, ...result} = user;
         ctx.body = {
-            user: await this.usersRepository.findById(id)
+            user: result
         };
     }
 
@@ -114,6 +135,30 @@ export default class UsersController {
         await this.usersRepository.delete(id);
 
         ctx.body = {error: null};
+    }
+
+    public async activateUser(ctx: IRouterContext) {
+        console.log("In the controller ACTIVATE USER");
+        const token = ctx.request.query.activationToken;
+        const id = parseInt(ctx.params.id);
+
+        let user = await this.usersRepository.findById(id);
+        if (!user) ctx.throw(404);
+
+        if (user.activationToken === token) {
+            await this.usersRepository.update(id, { activationToken: "", active: true });
+            user = await this.usersRepository.findById(id);
+            const {password, ...result} = user;
+            ctx.body = {
+                'success': 'Email has been verified and user account activated!',
+                user: result
+            };
+        } else {
+            ctx.body = {
+                error: 'Activation tokens did not match!'
+            };
+        }    
+        
     }
 
 }

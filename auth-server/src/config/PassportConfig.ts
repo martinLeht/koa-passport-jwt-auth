@@ -28,11 +28,15 @@ export default class PassportConfig {
                     return done(null, false);
                 }
 
-
                 try {
                     if (await bcryptjs.compare(password, user.password)) {
                         console.log('password is valid');
-                        return done(null, user);
+                        if (user.active) {
+                            return done(null, user);
+                        } else {
+                            console.log('Account has not been activated. Verify your email and try again!');
+                            return done(null, false);
+                        }
 
                     } else {
                         console.log('password is incorrect');
