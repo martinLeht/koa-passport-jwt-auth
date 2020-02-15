@@ -15,6 +15,9 @@
 mat-card-title{
     padding-bottom: 1.5em;
 }
+mat-card-subtitle{
+    padding-top: 1em;
+}
 mat-form-field{
     max-width: 100%;
     width: 100%;
@@ -28,5 +31,20 @@ mat-form-field{
     max-width: 47.5%;
     width: 47.5%;
     border-color: $hoods-title-color;
+    margin: auto;
+}
+.social-login{
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    display: inline-flex;
+    margin: auto;
+}
+#fb-login{
+    width: 50%;
+    margin: auto;
+}
+#gg-login{
+    width: 50%;
     margin: auto;
 }
