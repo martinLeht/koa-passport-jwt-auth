@@ -2,23 +2,29 @@
     <mat-card class="login-card">
         <mat-card-title>Login</mat-card-title>
         <mat-card-content>
-            <mat-form-field appearance="fill">
-                <mat-label>Email</mat-label>
-                <input matInput placeholder="mail@example.com">
-                <!--<mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error>-->
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Password</mat-label>
-                <input matInput [type]="hide ? 'password' : 'text'">
-                <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-            </mat-form-field>
-            <div class="login-buttons">
-                <button mat-stroked-button>Login</button>
-                <button routerLink="/register" routerLinkActive="active" mat-stroked-button>Register</button>
-            </div>
-            <mat-card-subtitle>Continue with:</mat-card-subtitle>
+            <!--<form [formGroup]="loginForm" [hidden]="success">-->
+            <form [formGroup]="loginForm" (ngSubmit)="submitHandler()">
+                <mat-form-field appearance="fill">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="email" placeholder="mail@example.com">
+                    <mat-error *ngIf="email.invalid && email.touched">Email does not look right</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input matInput formControlName="password" [type]="hide ? 'password' : 'text'">
+                    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                    <mat-hint>Password must contain letters, numbers and have length of 8-32 characters</mat-hint>
+                    <mat-error *ngIf="password.invalid && password.touched">Password invalid</mat-error>
+                    <!--<mat-error *ngIf="password.errors.minlength">Password too short</mat-error>-->
+                </mat-form-field>
+                <div class="login-buttons">
+                    <button mat-stroked-button type="submit" [disabled]="loginForm.invalid">Login</button>
+                    <button routerLink="/register" routerLinkActive="active" mat-stroked-button>Register</button>
+                </div>
+                <mat-card-subtitle>Continue with:</mat-card-subtitle>
+            </form>
             <div class="social-login">
                 <div id="fb-login">Facebook</div>
                 <div id="gg-login">Google</div>
