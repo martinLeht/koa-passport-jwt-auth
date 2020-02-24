@@ -66,6 +66,7 @@ export class LoginComponent implements OnInit {
     // Try to send the data
     try {
       this.loginPost = this.http.post(this.ROOT_URL + '/login', this.loginForm.value);
+      console.log(this.loginPost);
       this.success = true;
     } catch(err) {
       console.error(err);
