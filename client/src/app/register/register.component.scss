@@ -1,0 +1,52 @@
+@import '../../styles.scss';
+
+.register-container{
+    padding-top: 15%;
+}
+.register-card{
+    max-width: 45%;
+    width: 20em;
+    max-height: 50%;
+    height: auto;
+    padding: 3em;
+    border: 1.5px solid $hoods-title-color;
+    border-radius: 4px;
+    margin: auto;
+}
+mat-card-title{
+    padding-bottom: 0.5em;
+}
+mat-card-subtitle{
+    padding-top: 1em;
+}
+mat-form-field{
+    max-width: 100%;
+    width: 100%;
+}
+.register-buttons{
+    max-width:100%;
+    width: 100%;
+    padding-top: 3em;
+    display: inline-flex;
+}
+.register-buttons button{
+    max-width: 47.5%;
+    width: 47.5%;
+    border-color: $hoods-title-color;
+    margin: auto;
+}
+.social-login{
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    display: inline-flex;
+    margin: auto;
+}
+#fb-login{
+    width: 50%;
+    margin: auto;
+}
+#gg-login{
+    width: 50%;
+    margin: auto;
+}

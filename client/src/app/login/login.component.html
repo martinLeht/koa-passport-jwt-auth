@@ -15,7 +15,7 @@
                     <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                         <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
-                    <mat-hint>Password must contain letters, numbers and have length of 8-32 characters</mat-hint>
+                    <mat-hint>Password must contain only letters, numbers and have length of 8-32 characters</mat-hint>
                     <mat-error *ngIf="password.invalid && password.touched">Password invalid</mat-error>
                     <!--<mat-error *ngIf="password.errors.minlength">Password too short</mat-error>-->
                 </mat-form-field>
