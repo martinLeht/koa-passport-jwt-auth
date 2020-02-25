@@ -3,17 +3,17 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { UserInformationComponent } from './userinformation/userinformation.component';
 import { ProfileComponent } from './profile/profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
 
 //Material imports
 import { MatMenuModule } from '@angular/material/';
+import { AuthService } from './auth.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UserInformationComponent,
     ProfileComponent
   ],
   imports: [
@@ -21,8 +21,9 @@ import { MatMenuModule } from '@angular/material/';
     AppRoutingModule,
     BrowserAnimationsModule,
     MatMenuModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
