@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { JsonPipe } from '@angular/common';
 //import { LoginPost } from './loginPost';
-//import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
@@ -18,10 +20,9 @@ export class LoginComponent implements OnInit {
 
   // HTTP root
   readonly ROOT_URL = 'http://localhost:3000';
-
   loginPost: any;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) { }
+  constructor(private fb: FormBuilder, private http: HttpClient, private authService: AuthService) { }
 
   ngOnInit() {
     // Init login form
@@ -51,22 +52,11 @@ export class LoginComponent implements OnInit {
   // RxJS submit
   async submitHandler() {
     this.loading = true;
-    /*const emailValue = this.loginForm.get('email').value;
-    const passwordValue = this.loginForm.get('password').value;
-    console.log(emailValue);
-    console.log(passwordValue);
-
-    // Post data
-    const data: LoginPost = {
-      email: emailValue,
-      password: passwordValue
-    }
-    */
-
     // Try to send the data
     try {
-      this.loginPost = this.http.post(this.ROOT_URL + '/login', this.loginForm.value);
-      console.log(this.loginPost);
+      //this.authService.loginUser(this.loginForm.value).subscribe(data => this.respData = data);
+      //this.loginPost = this.http.post(this.ROOT_URL + '/login', this.loginForm.value).subscribe(data => this.respData = data)
+      this.loginPost = this.http.post(this.ROOT_URL + '/login', this.loginForm.value).toPromise().then(data => console.log(data))
       this.success = true;
     } catch(err) {
       console.error(err);
