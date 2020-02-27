@@ -69,7 +69,7 @@ export default class UsersController {
                 console.log(info.message);
             } else {
                 if (!user) {
-                    ctx.throw(401, 'Invalid username or password');
+                    ctx.throw(401, err.error);
                 }
 
                 const token = jwt.sign({id: user.id}, JWT_SECRET);
