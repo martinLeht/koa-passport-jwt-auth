@@ -35,7 +35,7 @@ export default class PassportConfig {
                             return done(null, user);
                         } else {
                             console.log('Account has not been activated. Verify your email and try again!');
-                            return done(null, false);
+                            return done({ error: "Account has not been activated. Verify your email and try again!"}, false);
                         }
 
                     } else {
