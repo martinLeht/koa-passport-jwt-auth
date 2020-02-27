@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { JsonPipe } from '@angular/common';
-//import { LoginPost } from './loginPost';
-import { Observable, of } from 'rxjs';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -22,7 +18,7 @@ export class LoginComponent implements OnInit {
   readonly ROOT_URL = 'http://localhost:3000';
   loginPost: any;
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private authService: AuthService) { }
+  constructor(private fb: FormBuilder, private authService: AuthService) { }
 
   ngOnInit() {
     // Init login form
@@ -49,19 +45,11 @@ export class LoginComponent implements OnInit {
     return this.loginForm.get('password');
   }
 
-  // RxJS submit
+  // Submit data
   async submitHandler() {
     this.loading = true;
-    // Try to send the data
-    try {
-      //this.authService.loginUser(this.loginForm.value).subscribe(data => this.respData = data);
-      //this.loginPost = this.http.post(this.ROOT_URL + '/login', this.loginForm.value).subscribe(data => this.respData = data)
-      this.loginPost = this.http.post(this.ROOT_URL + '/login', this.loginForm.value).toPromise().then(data => console.log(data))
-      this.success = true;
-    } catch(err) {
-      console.error(err);
-    }
-    
+    this.success = this.authService.loginUser(this.loginForm.value);
+    console.log(this.success)
     this.loading = false;
   }
 
