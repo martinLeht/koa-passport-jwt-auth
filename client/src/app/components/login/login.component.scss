@@ -1,9 +1,9 @@
-@import '../../styles.scss';
+@import '../../../styles.scss';
 
-.information-container{
+.login-container{
     padding-top: 15%;
 }
-.information-card{
+.login-card{
     max-width: 45%;
     width: 20em;
     max-height: 50%;
@@ -23,15 +23,31 @@ mat-form-field{
     max-width: 100%;
     width: 100%;
 }
-.information-buttons{
+.login-buttons{
     max-width:100%;
     width: 100%;
-    padding-top: 3em;
+    padding-top: 2.5em;
+    padding-bottom: 0.5em;
     display: inline-flex;
 }
-.information-buttons button{
+.login-buttons button{
     max-width: 47.5%;
     width: 47.5%;
     border-color: $hoods-title-color;
+    margin: auto;
+}
+.social-login{
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    display: inline-flex;
+    margin: auto;
+}
+#fb-login{
+    width: 50%;
+    margin: auto;
+}
+#gg-login{
+    width: 50%;
     margin: auto;
 }
