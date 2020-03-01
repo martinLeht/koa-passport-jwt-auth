@@ -30,17 +30,15 @@ export default class PassportConfig {
 
                 try {
                     if (await bcryptjs.compare(password, user.password)) {
-                        console.log('password is valid');
                         if (user.active) {
-                            return done(null, user);
+                            const {password, ...userData} = user;
+                            return done(null, userData, { message: "Successfully logged in!" });
                         } else {
-                            console.log('Account has not been activated. Verify your email and try again!');
-                            return done({ error: "Account has not been activated. Verify your email and try again!"}, false);
+                            return done(null, false, { message: "Account has not been activated. Verify your email and try again!" });
                         }
 
                     } else {
-                        console.log('password is incorrect');
-                        return done(null, false)
+                        return done(null, false, { message: "Incorrect password" });
                     }
                 } catch (e) {
                     return done(e);

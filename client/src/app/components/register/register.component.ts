@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { RegisterPost } from './registerPost';
-import { Observable } from 'rxjs';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { Router } from '@angular/router';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +19,16 @@ export class RegisterComponent implements OnInit {
   // HTTP root
   readonly ROOT_URL = 'http://localhost:3000';
 
-  constructor(private fb: FormBuilder, private http: HttpClient) { }
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private userService: UserService,
+    private tokenStorage: TokenStorageService
+  ) {
+    if (this.tokenStorage.getToken()) {
+      this.router.navigate(['/']);
+    }
+  }
 
   ngOnInit() {
     // Init register form
@@ -40,16 +49,26 @@ export class RegisterComponent implements OnInit {
     })
   }
 
-    // Get functions
-    get email() {
-      return this.registerForm.get('email');
-    }
-    get username() {
-      return this.registerForm.get('username');
-    }
-    get password() {
-      return this.registerForm.get('password');
-    }
+  // Get functions
+  get email() {
+    return this.registerForm.get('email');
+  }
+  get username() {
+    return this.registerForm.get('username');
+  }
+  get password() {
+    return this.registerForm.get('password');
+  }
+
+  registerUser() {
+    this.userService.register(this.registerForm.value).subscribe((res) => {
+      if (res.success) {
+        console.log(res.success);
+        this.registerForm.reset();
+        this.router.navigate(['/login'], { state: { success: res.success } });
+      }
+    });
+  }
 
 
 

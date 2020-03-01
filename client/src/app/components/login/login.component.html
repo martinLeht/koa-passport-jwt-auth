@@ -1,7 +1,10 @@
-<div class="login-container">
+<div *ngIf="!isLoggedIn" class="login-container">
     <mat-card class="login-card">
         <mat-card-title>Login</mat-card-title>
         <mat-card-content>
+            <div *ngIf="alert != undefined" id="alert-success">
+                <p>{{ alert }}</p>
+            </div>
             <!--<form [formGroup]="loginForm" [hidden]="success">-->
             <form [formGroup]="loginForm" (ngSubmit)="submitHandler()">
                 <mat-form-field appearance="fill">
@@ -12,7 +15,7 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Password</mat-label>
                     <input matInput formControlName="password" [type]="hide ?  'text' : 'password'">
-                    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                    <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                         <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
                     <mat-hint>Password must contain only letters, numbers and have length of 8-32 characters</mat-hint>
@@ -21,7 +24,7 @@
                 </mat-form-field>
                 <div class="login-buttons">
                     <button mat-stroked-button type="submit" [disabled]="loginForm.invalid">Login</button>
-                    <button routerLink="/register" routerLinkActive="active" mat-stroked-button>Register</button>
+                    <button type="button" routerLink="/register" routerLinkActive="active" mat-stroked-button>Register</button>
                 </div>
                 <mat-card-subtitle>Continue with:</mat-card-subtitle>
             </form>

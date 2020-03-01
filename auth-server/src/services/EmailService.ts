@@ -68,7 +68,7 @@ export class EmailService {
             );
             MailService.send(emailMsg).then((sent) => {
                 console.log("Successfully sent verification token to user email!");
-                resolve({ success: "Successfully sent verification token to user email!" });
+                resolve({ success: "Successfully registered! Verify your email to activate your account and log in." });
             }).catch(error => {
                 console.log("ERROR: " + error);
                 console.log(typeof(error));

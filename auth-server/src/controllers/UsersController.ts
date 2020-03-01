@@ -47,13 +47,11 @@ export default class UsersController {
         const {password, ...result} = await this.usersRepository.findById(id);
         if (response['error']) {
             ctx.body = {
-                error: response['error'],
-                user: result
+                error: response['error']
             };
         } else {
             ctx.body = {
-                success: response['success'],
-                user: result
+                success: response['success']
             };
         }
     }
@@ -64,17 +62,24 @@ export default class UsersController {
             if (err) {
                 console.log(err);
                 next();
-            }
-            if (info != undefined) {
-                console.log(info.message);
             } else {
                 if (!user) {
-                    ctx.throw(401, err.error);
+                    if (info != undefined) {
+                        console.log("INFO: " + info.message);
+                        ctx.throw(403, info.message);
+                    } else { 
+                        ctx.throw(401, 'User with provided email does not exist');
+                    }
+                    
                 }
 
-                const token = jwt.sign({id: user.id}, JWT_SECRET);
+                const token = jwt.sign({ id: user.id}, JWT_SECRET);
 
                 ctx.body = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    active: user.active,
                     token: token
                 }
             }
@@ -147,12 +152,10 @@ export default class UsersController {
 
         if (user.activationToken === token) {
             await this.usersRepository.update(id, { activationToken: "", active: true });
-            user = await this.usersRepository.findById(id);
-            const {password, ...result} = user;
             ctx.body = {
-                'success': 'Email has been verified and user account activated!',
-                user: result
+                'success': 'Email has been verified and user account activated!'
             };
+            ctx.redirect('http://localhost:4200/login');
         } else {
             ctx.body = {
                 error: 'Activation tokens did not match!'

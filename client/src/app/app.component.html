@@ -2,10 +2,12 @@
 
 <button mat-button [matMenuTriggerFor]="menu">Test</button>
 <mat-menu #menu="matMenu">
-  <button mat-menu-item routerLink="/login" routerLinkActive="active">Login</button>
-  <button mat-menu-item routerLink="/register" routerLinkActive="active">Register</button>
-  <button mat-menu-item routerLink="/userinformation" routerLinkActive="active">Additional Info</button>
-  <button mat-menu-item routerLink="/profile" routerLinkActive="active">Profile</button>
+  <button mat-menu-item *ngIf="!isLoggedIn" routerLink="/login" routerLinkActive="active">Login</button>
+  <button mat-menu-item *ngIf="!isLoggedIn" routerLink="/register" routerLinkActive="active">Register</button>
+  <button mat-menu-item *ngIf="isLoggedIn" routerLink="/userinformation" routerLinkActive="active">Additional Info</button>
+  <button mat-menu-item *ngIf="isLoggedIn" routerLink="/profile" routerLinkActive="active">Profile</button>
+  <button mat-menu-item *ngIf="isLoggedIn" routerLink="/users" routerLinkActive="active">Users</button>
+  <button mat-menu-item *ngIf="isLoggedIn" (click)="logout()">Logout</button>
 </mat-menu>
 
 <!-- Here we will load the current view: -->
