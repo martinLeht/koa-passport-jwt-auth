@@ -14,7 +14,7 @@ export class UsersListComponent implements OnInit {
 
   users: IUser[];
   loading: boolean = false;
-  error;
+  error: string;
 
   displayedColumns: string[] = ['userId', 'username', 'email', 'active'];
   dataSource = this.users;
@@ -25,18 +25,11 @@ export class UsersListComponent implements OnInit {
     this.loading = true
     this.userService.getUsers().subscribe(
       data => {
-        for(let user in data) {
-          console.log(user);
-        }
-        console.log("DATA: " + data.users);
         this.users = data.users;
         this.dataSource = this.users;
-        
-        console.log(this.users);
         this.loading = false;
       },
       err => {
-        console.log("ERROR: " + err);
         this.error = err.error.message;
         this.loading = false;
       }

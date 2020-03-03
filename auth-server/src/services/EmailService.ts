@@ -36,7 +36,6 @@ export class EmailService {
                 resolve({ success: "Successfully sent to email: " + toEmail });
             }).catch(error => {
                 console.log("ERROR: " + error);
-                console.log(typeof(error));
                 reject({ error: error })
             });
         });
@@ -71,7 +70,6 @@ export class EmailService {
                 resolve({ success: "Successfully registered! Verify your email to activate your account and log in." });
             }).catch(error => {
                 console.log("ERROR: " + error);
-                console.log(typeof(error));
                 reject({ error: error })
             });
         });

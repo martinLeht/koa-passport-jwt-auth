@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   isLoggedIn = false;
   error: [number, string];
   returnUrl: string;
-  alert: string;
+  alerts: Map<string, Array<string>>;
 
   constructor(
     private router: Router,
@@ -33,12 +33,19 @@ export class LoginComponent implements OnInit {
       this.isLoggedIn = true;
       this.router.navigate(['/']);
     } else {
-      if (this.router.getCurrentNavigation().extras.state) {
-        this.alert = this.router.getCurrentNavigation().extras.state.success; 
-      } else {
-        this.alert = undefined;
+      this.alerts = new Map();
+      this.alerts.set('success', []);
+      this.alerts.set('error', []);
+      if (this.router.getCurrentNavigation() != null && this.router.getCurrentNavigation().extras.state) {
+        if (this.router.getCurrentNavigation().extras.state.success) {
+          this.alerts.get('success').push(this.router.getCurrentNavigation().extras.state.success);
+        }
+        if (this.router.getCurrentNavigation().extras.state.error) {
+          this.alerts.get('error').push(this.router.getCurrentNavigation().extras.state.error);
+        }
       }
     }
+    
     
   }
 
@@ -58,9 +65,8 @@ export class LoginComponent implements OnInit {
         Validators.pattern('^(?=.*[0-9])(?=[a-zA-Z])([a-zA-Z0-9]+)$')//([ !#,-_&\$\.\?+]) special chars
       ]
     ],
-    })
+    });
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    
   }
   // Get functions
   get email() {
@@ -85,11 +91,21 @@ export class LoginComponent implements OnInit {
       },
       err => {
         this.error = [err.status, err.error.error];
-        this.success = false;
         console.log(this.error);
+        this.success = false;
+        this.isLoggedIn = false;
+        this.clearAlerts();
+        this.alerts.get('error').push(err.error.error);
+        this.loginForm.reset();
       }
     );
     this.loading = false;
+  }
+
+  clearAlerts() {
+    this.alerts.clear();
+    this.alerts.set('success', []);
+    this.alerts.set('error', []);
   }
 
   reloadPage() {

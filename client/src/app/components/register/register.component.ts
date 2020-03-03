@@ -16,8 +16,6 @@ export class RegisterComponent implements OnInit {
   // Form state
   loading = false;
   success = false;
-  // HTTP root
-  readonly ROOT_URL = 'http://localhost:3000';
 
   constructor(
     private router: Router,
@@ -63,7 +61,6 @@ export class RegisterComponent implements OnInit {
   registerUser() {
     this.userService.register(this.registerForm.value).subscribe((res) => {
       if (res.success) {
-        console.log(res.success);
         this.registerForm.reset();
         this.router.navigate(['/login'], { state: { success: res.success } });
       }

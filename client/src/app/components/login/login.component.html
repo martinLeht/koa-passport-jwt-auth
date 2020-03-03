@@ -1,10 +1,20 @@
-<div *ngIf="!isLoggedIn" class="login-container">
+<div class="login-container">
     <mat-card class="login-card">
         <mat-card-title>Login</mat-card-title>
         <mat-card-content>
-            <div *ngIf="alert != undefined" id="alert-success">
-                <p>{{ alert }}</p>
+            <div *ngIf="alerts != undefined" id="alerts">
+                <div *ngIf="alerts.get('success').length > 0" >
+                    <p *ngFor="let successMsg of alerts.get('success')" class="alert-success">
+                        {{successMsg}}
+                    </p>
+                </div>
+                <div *ngIf="alerts.get('error').length > 0">
+                    <p *ngFor="let errorMsg of alerts.get('error')" class="alert-error">
+                        {{errorMsg}}
+                    </p>
+                </div>
             </div>
+            
             <!--<form [formGroup]="loginForm" [hidden]="success">-->
             <form [formGroup]="loginForm" (ngSubmit)="submitHandler()">
                 <mat-form-field appearance="fill">

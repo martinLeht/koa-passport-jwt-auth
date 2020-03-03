@@ -44,7 +44,7 @@ export class AuthService {
 
   }
 
-  logOutUser(){
+  logoutUser(){
     this.tokenStorage.signOut();
   }
 
