@@ -12,13 +12,11 @@ import { MatMenuModule, MatTableModule } from '@angular/material/';
 
 import { AuthService } from './services/auth.service';
 import { authInterceptorProviders } from './helpers/auth.interceptor';
-import { ProfileComponent }   from './components/profile/profile.component';
 import { UsersListComponent } from './components/users-list/users-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProfileComponent,
     UsersListComponent
   ],
   imports: [

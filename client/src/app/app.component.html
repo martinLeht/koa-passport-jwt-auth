@@ -1,14 +1,12 @@
 <!-- Global page content -->
 
-<button mat-button [matMenuTriggerFor]="menu">Test</button>
-<mat-menu #menu="matMenu">
-  <button mat-menu-item *ngIf="!isLoggedIn" routerLink="/login" routerLinkActive="active">Login</button>
-  <button mat-menu-item *ngIf="!isLoggedIn" routerLink="/register" routerLinkActive="active">Register</button>
-  <button mat-menu-item *ngIf="isLoggedIn" routerLink="/userinformation" routerLinkActive="active">Additional Info</button>
-  <button mat-menu-item *ngIf="isLoggedIn" routerLink="/profile" routerLinkActive="active">Profile</button>
-  <button mat-menu-item *ngIf="isLoggedIn" routerLink="/users" routerLinkActive="active">Users</button>
-  <button mat-menu-item *ngIf="isLoggedIn" (click)="logout()">Logout</button>
-</mat-menu>
+<button class="test" mat-menu-item *ngIf="!isLoggedIn" routerLink="/login" routerLinkActive="active">Login</button>
+<button class="test" mat-menu-item *ngIf="!isLoggedIn" routerLink="/register" routerLinkActive="active">Register</button>
+<button class="test" mat-menu-item *ngIf="isLoggedIn" routerLink="/userinformation" routerLinkActive="active">Additional Info</button>
+<button class="test" mat-menu-item *ngIf="isLoggedIn" routerLink="/profile" routerLinkActive="active">Profile</button>
+<button class="test" mat-menu-item *ngIf="isLoggedIn" routerLink="/users" routerLinkActive="active">Users</button>
+<button class="test" mat-menu-item *ngIf="isLoggedIn" (click)="logout()">Logout</button>
+
 
 <!-- Here we will load the current view: -->
 <router-outlet></router-outlet>

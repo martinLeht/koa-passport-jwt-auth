@@ -1,15 +1,16 @@
 @import '../styles.scss';
 
-nav{
-    width: 100%;
-    display: inline-flex;
-    height: 75px;
-    background-color: $hoods-gray-color;
-}
-button{
+
+.test{
     max-width: 100%;
     display: inline-flex;
     margin: auto;
     width: 20%;
+    color: whitesmoke;
     background-color: $hoods-title-color;
+}
+
+.test:hover{
+    color: $hoods-black-color;
+    background-color: $hoods-button-highlight !important;
 }

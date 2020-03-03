@@ -1,1 +1,38 @@
-<p>profile works!</p>
+<div class="profile-container">
+    <mat-card class="profile-card" id="userinfo-container">
+        <mat-card-title>Your profile</mat-card-title>
+        <mat-card-content>
+            <form [formGroup]="profileForm">
+                <mat-form-field appearance="outline">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" ng-disabled="formEditOn">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Real name</mat-label>
+                    <input matInput formControlName="realname" ng-disabled="formEditOn">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="email" ng-disabled="formEditOn">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Neighbourhood</mat-label>
+                    <input matInput formControlName="hood" ng-disabled="formEditOn">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>ZIP-code</mat-label>
+                    <input matInput formControlName="zip" ng-disabled="formEditOn">
+                </mat-form-field>
+                <div id="profile-buttons">
+                    <button mat-stroked-button id="buttonEdit" class="profile-button" ng-click="editToggle()">Edit</button>
+                    <button mat-stroked-button id="buttonSubmit" class="profile-button" type="submit" >Submit</button><!--[disabled]="profileForm.invalid"-->
+                    <button mat-stroked-button id="buttonDownload" class="profile-button" >Download my information</button>
+                    <button mat-stroked-button id="buttonDelete" class="profile-button" >Delete account and data</button>
+                </div>
+            </form>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="profile-card" id="newsfeed-container">
+        <mat-card-title>News:</mat-card-title>
+    </mat-card>
+</div>
