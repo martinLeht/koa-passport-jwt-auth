@@ -28,7 +28,6 @@ export default class DatabaseService {
                 // Use the connection
                 connection.query(obj.sql, (err: Error, rows: any[], fields: FieldInfo[]) => {
                     if (err) {
-                        console.log(err);
                         reject(err);
 
                     } else {
@@ -38,9 +37,7 @@ export default class DatabaseService {
                             let result: any[] = [];
                             if (rows.length > 0) {
                                 for (let row of rows) {
-                                    console.log(row);
                                     let item: any = {};
-                                    
                                     obj.columns.forEach(column => {
                                         item[column] = row[column];
                                     });
@@ -53,7 +50,7 @@ export default class DatabaseService {
                     }
                     // When done with the connection, release it.
                     connection.release();
-
+                    console.log("Connection released");
                     // Don't use the connection here, it has been returned to the pool.
                 });
             })
@@ -66,6 +63,7 @@ export default class DatabaseService {
                 if (err) {
                     reject(err);
                 } else {
+                    console.log("Connected to database!");
                     resolve(connection);
                 } 
             });

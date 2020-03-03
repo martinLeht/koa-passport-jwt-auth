@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 
 import { RegisterRoutingModule } from './register-routing.module';
 import { RegisterComponent} from './register.component';
@@ -19,7 +18,6 @@ import {ReactiveFormsModule, FormControl, Validators} from '@angular/forms';
   declarations: [RegisterComponent],
   imports: [
     CommonModule,
-    HttpClientModule,
     RegisterRoutingModule,
     MatButtonModule,
     MatCardModule,
