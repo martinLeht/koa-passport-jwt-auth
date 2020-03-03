@@ -35,21 +35,7 @@ export class AuthService {
       password: post.password
     }, httpOptions);
   }
-
-  setUserDetails(){
-
-  }
-
-  getUserDetails(){
-
-  }
-
   logoutUser(){
     this.tokenStorage.signOut();
   }
-
-  setCookie(name: string, value: string, exp: number, ){
-
-  }
-
 }

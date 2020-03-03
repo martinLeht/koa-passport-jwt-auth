@@ -68,6 +68,8 @@ export class LoginComponent implements OnInit {
     });
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
+
+  
   // Get functions
   get email() {
     return this.loginForm.get('email');
