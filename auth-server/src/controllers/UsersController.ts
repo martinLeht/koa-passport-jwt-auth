@@ -72,10 +72,12 @@ export default class UsersController {
                 const token = jwt.sign({ id: user.id}, JWT_SECRET);
                 console.log("Successfully logged in!");
                 ctx.body = {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    active: user.active,
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        active: user.active
+                    },
                     token: token
                 }
             }
@@ -86,9 +88,8 @@ export default class UsersController {
 
     public async getUsers(ctx: IRouterContext) {
         const allUsers = await this.usersRepository.findAll();
-        const users = allUsers.map(({password, ...result}) => result);
+        const users = allUsers.map(({password, activationToken, ...result}) => result);
         ctx.body = {
-            error: null,
             users: users
         };
     }
@@ -100,22 +101,41 @@ export default class UsersController {
         
         if (!user) ctx.throw(404);
 
-        const {password, ...result} = user;
+        const {password, activationToken, ...result} = user;
         ctx.body = {
             user: result
         };
     }
 
+    /*
+    public async getUserDetails(ctx: IRouterContext) {
+        const id = parseInt(ctx.params.id);
+        let user = await this.usersDetailsRepository.findById(id);
+        
+        if (!user) ctx.throw(404);
+
+        const {password, activationToken, ...result} = user;
+        ctx.body = {
+            user: result
+        };
+    }
+    */
+
     public async modifyUser(ctx: IRouterContext) {
         const id = parseInt(ctx.params.id);
         const data = ctx.request.body;
-
+        console.log(id);
+        console.log(data);
         let user = await this.usersRepository.findById(id);
-        if (!user) ctx.throw(404);
+        if (!user) ctx.throw(404, "User not found!");
 
         await this.usersRepository.update(id, data);
+        user = await this.usersRepository.findById(id);
+
+        const {password, activationToken, ...result} = user;
         console.log("Successfully updated user!");
         ctx.body = {
+            user: result,
             success: "Successfully updated!"
         };
     }
@@ -129,7 +149,7 @@ export default class UsersController {
         await this.usersRepository.delete(id);
         console.log("Successfully deleted user!");
         ctx.body = {
-            success: "Successfully deleted user!"
+            success: "Successfully deleted your account!"
         };
     }
 

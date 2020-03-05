@@ -8,7 +8,8 @@ CREATE TABLE UserDetails (
     `details_id` INT NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(100),
     `last_name` VARCHAR(100),
-    `suburb` VARCHAR(100) NOT NULL, 
+    `suburb` VARCHAR(100), 
+	`zipcode` INT(10),
     PRIMARY KEY (details_id)
 );
 

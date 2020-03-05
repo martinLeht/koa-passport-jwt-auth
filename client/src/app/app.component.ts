@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
     this.isLoggedIn = !!this.tokenStorage.getToken();
 
     if (this.isLoggedIn) {
-      const user = this.tokenStorage.getUser();
+      const user = this.tokenStorage.getCurrentUser();
       this.username = user.username;
     }
   }

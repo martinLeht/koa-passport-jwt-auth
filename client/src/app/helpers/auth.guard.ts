@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate {
   constructor(private router: Router, private tokenStorage: TokenStorageService) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const currentUser = this.tokenStorage.getUser();
+    const currentUser = this.tokenStorage.getCurrentUser();
     if (currentUser) {
         // logged in so return true
         return true;

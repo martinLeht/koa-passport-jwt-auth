@@ -7,6 +7,7 @@ import { TokenStorageService } from './token-storage.service';
 
 
 interface LoginResp{
+  user: IUser,
   token: string
 }
 
@@ -35,7 +36,8 @@ export class AuthService {
       password: post.password
     }, httpOptions);
   }
-  logoutUser(){
+
+  logoutUser() {
     this.tokenStorage.signOut();
   }
 }
