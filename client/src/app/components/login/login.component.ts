@@ -33,6 +33,7 @@ export class LoginComponent implements OnInit {
       this.isLoggedIn = true;
       this.router.navigate(['/']);
     } else {
+      this.isLoggedIn = false;
       this.alerts = new Map();
       this.alerts.set('success', []);
       this.alerts.set('error', []);
@@ -44,9 +45,7 @@ export class LoginComponent implements OnInit {
           this.alerts.get('error').push(this.router.getCurrentNavigation().extras.state.error);
         }
       }
-    }
-    
-    
+    }    
   }
 
   ngOnInit() {
@@ -84,7 +83,7 @@ export class LoginComponent implements OnInit {
     this.authService.loginUser(this.loginForm.value).subscribe(
       data => {
         this.tokenStorage.saveToken(data.token);
-        this.tokenStorage.saveUser(data);
+        this.tokenStorage.saveUser(data.user);
         
         this.success = true;
         this.isLoggedIn = true;
