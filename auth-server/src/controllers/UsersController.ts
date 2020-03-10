@@ -9,6 +9,9 @@ import User from "../models/User";
 import { TokenGenerator } from 'ts-token-generator';
 import { Next } from "koa";
 import { EmailService } from '../services/EmailService';
+import UserDetailsRepository from '../repositories/UserDetailsRepository';
+import { getHeapStatistics } from 'v8';
+import UserDetails from '../models/UserDetails';
 
 
 
@@ -18,7 +21,8 @@ export default class UsersController {
     constructor(@Inject private usersRepository: UsersRepository,
                 @Inject private helperService: HelperService,
                 @Inject private emailService: EmailService,
-                @Inject private tokenGenerator: TokenGenerator) {
+                @Inject private tokenGenerator: TokenGenerator,
+                @Inject private userDetailsRepository: UserDetailsRepository) {
     }
 
 
@@ -107,19 +111,35 @@ export default class UsersController {
         };
     }
 
-    /*
-    public async getUserDetails(ctx: IRouterContext) {
+    public async getUserWithDetails(ctx: IRouterContext) {
         const id = parseInt(ctx.params.id);
-        let user = await this.usersDetailsRepository.findById(id);
+        let userWithDetails = await this.usersRepository.findByIdWithDetails(id);
         
-        if (!user) ctx.throw(404);
+        if (!userWithDetails) ctx.throw(404);
 
-        const {password, activationToken, ...result} = user;
+        let user: User = Object.assign(new User(), userWithDetails);
+        const userDetails = Object.assign(new UserDetails(), userWithDetails);
+        user.detailsId = userDetails;
+        console.log(user);
+        console.log(userDetails);
+
+        const {password, activationToken, ...resultUser} = user;
         ctx.body = {
-            user: result
+            user: resultUser
         };
     }
-    */
+
+    public async getUserDetails(ctx: IRouterContext) {
+        const id = parseInt(ctx.params.id);
+        let details: UserDetails = await this.userDetailsRepository.findById(id);
+        
+        if (!details) ctx.throw(404, 'No details found for the user with id ' + id);
+
+        console.log(details);
+        ctx.body = {
+            details: details
+        };
+    }
 
     public async modifyUser(ctx: IRouterContext) {
         const id = parseInt(ctx.params.id);
@@ -127,8 +147,27 @@ export default class UsersController {
         console.log(id);
         console.log(data);
         let user = await this.usersRepository.findById(id);
-        if (!user) ctx.throw(404, "User not found!");
 
+        if (!user) ctx.throw(404, "User not found!");
+        
+        let userDetails: UserDetails = new UserDetails();
+        if (data.firstname !== undefined) userDetails.firstName = data.firstname;
+        if (data.lastname !== undefined) userDetails.lastName = data.lastname;
+        if (data.hood !== undefined) userDetails.suburb = data.hood;
+        if (data.zip !== undefined) userDetails.zipcode = data.zip;
+        
+        if ('firstName' in userDetails || 'lastName' in userDetails || 
+            'suburb'in userDetails || 'zipcode' in userDetails) {
+            if (user.details_id === undefined || user.details_id === null) {
+                const detailsId: number = await this.userDetailsRepository.insert(userDetails);
+                console.log("Inserted details id: " + detailsId);
+                data.detailsId = detailsId;
+            } else {
+                console.log("Updating");
+                await this.userDetailsRepository.update(id, userDetails);
+            }
+        }
+        
         await this.usersRepository.update(id, data);
         user = await this.usersRepository.findById(id);
 

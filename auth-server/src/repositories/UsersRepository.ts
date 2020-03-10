@@ -1,36 +1,73 @@
 import {Inject, Singleton} from 'typescript-ioc';
 import DatabaseService from '../services/DatabaseService';
+import UserDetailsRepository from './UserDetailsRepository';
+import UserDetails from '../models/UserDetails';
 
 const SELECT_ALL =
+    'u.id, u.details_id, u.username, u.email, u.password, u.activationToken, u.active, ' +
+    'ud.first_name, ud.last_name, ud.suburb, ud.zipcode';
+
+const SELECT_USER =
     'u.id, u.details_id, u.username, u.email, u.password, u.activationToken, u.active';
 
-const COLUMNS = [
-    'id', 'username', 'email', 'password', "activationToken", "active"
+const SELECT_DETAILS =
+    'ud.details_id, ud.first_name, ud.last_name, ud.suburb, ud.zipcode';
+
+const COLUMNS_ALL = [
+    'id', 'details_id', 'username', 'email', 'password', "activationToken", "active",
+    'first_name', 'last_name', 'suburb', 'zipcode'
+];
+
+const COLUMNS_USER = [
+    'id', 'details_id', 'username', 'email', 'password', "activationToken", "active"
+];
+
+const COLUMNS_DETAILS = [
+    'details_id', 'first_name', 'last_name', 'suburb', 'zipcode'
 ];
 
 
 @Singleton
 export default class UsersRepository {
 
-    constructor(@Inject private db: DatabaseService) {
+    constructor(@Inject private db: DatabaseService,
+                @Inject private userDetailsRepository: UserDetailsRepository) {
     }
 
     public async findAll() {
         const users = await this.db.find({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u',
-            columns: COLUMNS
+            sql: 'SELECT ' + SELECT_USER + ' FROM Users u',
+            columns: COLUMNS_USER
         });
+        return users;
+    }
 
-        for (let user of users) {
-            console.log(user);
-        }
+    public async findAllWithDetails() {
+        const users = await this.db.find({
+            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u ' + 
+                 'INNER JOIN UserDetails ud ON u.details_id = ud.details_id',
+            columns: COLUMNS_USER
+        });
         return users;
     }
 
     public async findById(id: number) {
         const users = await this.db.find({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u WHERE id = ' + id,
-            columns: COLUMNS
+            sql: 'SELECT ' + SELECT_USER + ' FROM Users u WHERE id = ' + id,
+            columns: COLUMNS_USER
+        });
+
+        if (users.length === 0) return undefined;
+
+        return users[0];
+    }
+
+    public async findByIdWithDetails(id: number) {
+        const users = await this.db.find({
+            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u ' 
+                + 'INNER JOIN UserDetails ud ON u.details_id = ud.details_id '
+                + 'WHERE id = ' + id,
+            columns: COLUMNS_ALL
         });
 
         if (users.length === 0) return undefined;
@@ -41,8 +78,8 @@ export default class UsersRepository {
 
     public async findByEmail(email: string) {
         const users = await this.db.find({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u WHERE u.email = \"' + email + '\"',
-            columns: COLUMNS
+            sql: 'SELECT ' + SELECT_USER + ' FROM Users u WHERE u.email = \"' + email + '\"',
+            columns: COLUMNS_USER
         })
 
         if (users.length === 0) return undefined;
@@ -58,7 +95,7 @@ export default class UsersRepository {
         active: boolean
     }) {
 
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<number>((resolve, reject) => {
             this.db.getConnection().then(connection => {
                 const userData = [
                     obj.username,
@@ -67,6 +104,7 @@ export default class UsersRepository {
                     obj.activationToken,
                     obj.active
                 ];
+                
                 let sql = 'INSERT INTO Users (username, email, password, activationToken, active) VALUES (?,?,?,?,?)';
 
                 connection.query(sql, userData, (err, result) => {
@@ -82,9 +120,10 @@ export default class UsersRepository {
                 throw new Error("Connection error: " + err);
             });
         });
-    }
+    }    
 
     public update(id: number, obj: {
+        detailsId?: number,
         username?: string,
         email?: string,
         password?: string,
@@ -95,6 +134,7 @@ export default class UsersRepository {
             this.db.getConnection().then(connection => {
 
                 const userData = [];
+                if (obj.detailsId !== undefined) userData.push(obj.detailsId);
                 if (obj.username !== undefined) userData.push(obj.username);
                 if (obj.email !== undefined) userData.push(obj.email);
                 if (obj.password !== undefined) userData.push(obj.password);
@@ -103,6 +143,7 @@ export default class UsersRepository {
                 userData.push(id);
 
                 let sql = 'UPDATE Users SET ';
+                if (obj.detailsId !== undefined) sql += 'details_id = ?, '
                 if (obj.username !== undefined) sql += 'username = ?, ';
                 if (obj.email !== undefined) sql += 'email = ?, ';
                 if (obj.password !== undefined) sql += 'password = ?, ';
