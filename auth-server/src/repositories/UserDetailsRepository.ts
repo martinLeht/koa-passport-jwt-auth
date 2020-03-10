@@ -1,5 +1,7 @@
 import {Inject, Singleton} from 'typescript-ioc';
 import DatabaseService from '../services/DatabaseService';
+import UsersRepository from './UsersRepository';
+import UserDetails from '../models/UserDetails';
 
 const SELECT_ALL =
     'ud.details_id, ud.first_name, ud.last_name, ud.suburb, ud.zipcode';
@@ -16,20 +18,22 @@ export default class UserDetailsRepository {
     }
 
     public async findAll() {
-        const users = await this.db.find({
+        const userDetails = await this.db.find({
             sql: 'SELECT ' + SELECT_ALL + ' FROM UserDetails ud',
             columns: COLUMNS
         });
 
-        for (let user of users) {
-            console.log(user);
+        for (let detail of userDetails) {
+            console.log(detail);
         }
-        return users;
+        return userDetails;
     }
 
     public async findById(id: number) {
         const users = await this.db.find({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM UserDetails ud WHERE id = ' + id,
+            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u ' +
+                 'INNER JOIN UserDetails ud ON u.details_id = ud.details_id ' + 
+                 'WHERE u.id = ' + id,
             columns: COLUMNS
         });
 
@@ -37,27 +41,22 @@ export default class UserDetailsRepository {
 
         return users[0];
     }
-    /*
 
-    public async insert(userId: number, obj: {
-        firstName?: string,
-        lastName?: string,
-        suburb?: string,
-        zipcode?: number
-    }) {
+    public async insert(obj: UserDetails) {
 
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection().then(connection => {
-                const userDetailsData = [
-                    obj.firstName,
-                    obj.lastName,
-                    obj.suburb,
-                    obj.zipcode
-                ];
-                let sql = 'INSERT INTO UserDetails ud (first_name, last_name, suburb, zipcode) VALUES (?,?,?,?)';
+                const detailsData = [];
+                if (obj.firstName !== undefined) detailsData.push(obj.firstName);
+                if (obj.lastName !== undefined) detailsData.push(obj.lastName);
+                if (obj.suburb !== undefined) detailsData.push(obj.suburb);
+                if (obj.zipcode !== undefined) detailsData.push(obj.zipcode);
 
-                connection.query(sql, userDetailsData, (err, result) => {
+                let sql = 'INSERT INTO UserDetails (first_name, last_name, suburb, zipcode) VALUES (?,?,?,?)';
+
+                connection.query(sql, detailsData, (err, result) => {
                     if (err) {
+                        console.log(err);
                         reject(err);
                     } else {
                         resolve(result.insertId);
@@ -71,30 +70,25 @@ export default class UserDetailsRepository {
         });
     }
 
-    public update(id: number, obj: {
-        userId: number,
-        firstName?: string,
-        lastName?: string,
-        suburb?: string,
-        zipcode?: number
-    }) {
+    public update(id: number, obj: UserDetails) {
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection().then(connection => {
 
-                const userData = [];
-                if (obj.username !== undefined) userData.push(obj.username);
-                if (obj.email !== undefined) userData.push(obj.email);
-                if (obj.password !== undefined) userData.push(obj.password);
-                if (obj.activationToken !== undefined) userData.push(obj.activationToken);
-                if (obj.active !== undefined) userData.push(obj.active);
-                userData.push(id);
+                const detailsData = [];
+                
+                if (obj.firstName !== undefined) detailsData.push(obj.firstName);
+                if (obj.lastName !== undefined) detailsData.push(obj.lastName);
+                if (obj.suburb !== undefined) detailsData.push(obj.suburb);
+                if (obj.zipcode !== undefined) detailsData.push(obj.zipcode);
+                detailsData.push(id);
 
-                let sql = 'UPDATE Users SET ';
-                if (obj.username !== undefined) sql += 'username = ?, ';
-                if (obj.email !== undefined) sql += 'email = ?, ';
-                if (obj.password !== undefined) sql += 'password = ?, ';
-                if (obj.activationToken !== undefined) sql += 'activationToken = ?, ';
-                if (obj.active !== undefined) sql += 'active = ?, ';
+                let sql = 'UPDATE UserDetails ud ' +
+                          'INNER JOIN Users u ON u.details_id = ud.details_id ' +
+                          'SET ';
+                if (obj.firstName !== undefined) sql += 'ud.first_name = ?, ';
+                if (obj.lastName !== undefined) sql += 'ud.last_name = ?, ';
+                if (obj.suburb !== undefined) sql += 'ud.suburb = ?, ';
+                if (obj.zipcode !== undefined) sql += 'ud.zipcode = ?, ';
 
                 if (sql.substr(-2) === ', ') {
                     sql = sql.substr(0, sql.length - 2);
@@ -104,10 +98,13 @@ export default class UserDetailsRepository {
                     return;
                 }
 
-                sql += ' WHERE id = ?';
+                sql += ' WHERE u.id = ?';
 
-                connection.query(sql, userData, (err, result) => {
-                    if (err) reject(err);
+                connection.query(sql, detailsData, (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        reject(err);
+                    }
                     else resolve();
 
                     connection.release();
@@ -120,7 +117,7 @@ export default class UserDetailsRepository {
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection
             ().then(connection => {
-                let sql = 'DELETE FROM Users WHERE id = ' + id;
+                let sql = 'DELETE FROM UserDetails WHERE details_id = ' + id;
 
                 connection.query(sql, (err, result) => {
                     if (err) {
@@ -148,6 +145,5 @@ export default class UserDetailsRepository {
             active: row.active
         };
     }
-    */
 
 }

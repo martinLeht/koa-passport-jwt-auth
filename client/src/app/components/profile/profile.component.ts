@@ -5,6 +5,7 @@ import { IUser } from 'src/app/models/IUser';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { IUserDetails } from 'src/app/models/IUserDetails';
 
 @Component({
   selector: 'app-profile',
@@ -19,10 +20,11 @@ export class ProfileComponent implements OnInit {
   formEditOn = false;
   user: IUser;
   usernameVal = "";
-  realnameVal = "";
+  firstnameVal = "";
+  lastnameVal = "";
   emailVal = "";
   hoodVal = "";
-  zipVal = "";
+  zipVal: number;
   
   alerts: Map<string, Array<string>>;
 
@@ -46,23 +48,27 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.initUserData();
     this.profileForm = this.fb.group({
       username: [this.usernameVal],
-      realname: [this.realnameVal],
+      firstname: [this.firstnameVal],
+      lastname: [this.lastnameVal],
       email: [this.emailVal],
       hood: [this.hoodVal],
       zip: [this.zipVal]
     });
     this.profileForm.disable();
+    this.initUserData();
   }
 
   // Get functions
   get username() {
     return this.profileForm.get('username');
   }
-  get realname() {
-    return this.profileForm.get('realname');
+  get firstname() {
+    return this.profileForm.get('firstname');
+  }
+  get lastname() {
+    return this.profileForm.get('lastname');
   }
   get email() {
     return this.profileForm.get('email');
@@ -78,6 +84,34 @@ export class ProfileComponent implements OnInit {
     let id: number = this.tokenStorage.getCurrentUser().id;
     this.usernameVal = this.tokenStorage.getCurrentUser().username;
     this.emailVal = this.tokenStorage.getCurrentUser().email;
+
+    this.userService.getUserDetailsById(id).subscribe(
+      data => {
+        this.firstnameVal = data.details.first_name;
+        this.lastnameVal = data.details.last_name;
+        this.hoodVal = data.details.suburb;
+        this.zipVal = data.details.zipcode;
+        this.profileForm.patchValue({
+          username: this.usernameVal,
+          email: this.emailVal,
+          firstname: this.firstnameVal,
+          lastname: this.lastnameVal,
+          hood: this.hoodVal,
+          zip: this.zipVal
+        });
+      },
+      error => {
+        console.log(error);
+        if (error.status !== 404) {
+          this.clearAlerts();
+          this.alerts.get('error').push('Something went wrong, try again!');
+        }
+        this.profileForm.patchValue({
+          username: this.usernameVal,
+          email: this.emailVal
+        });
+      }
+    );
   }
 
   editToggle(){
@@ -89,9 +123,6 @@ export class ProfileComponent implements OnInit {
       this.formEditOn = true;
       this.profileForm.enable();
       this.profileForm.controls['email'].disable();
-      this.profileForm.controls['realname'].disable();
-      this.profileForm.controls['hood'].disable();
-      this.profileForm.controls['zip'].disable();
       console.log("toggle: "+ this.formEditOn);
     }
   }

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IUser } from '../models/IUser';
 import { RegisterPost } from '../components/register/registerPost';
+import { IUserDetails } from '../models/IUserDetails';
 
 
 interface UpdatePost {
@@ -39,6 +40,14 @@ export class UserService {
 
   getUserById(id: number): Observable<IUser> {
     return this.http.get<IUser>(this.API_URL + id, httpOptions);
+  }
+
+  getUserByIdWithDetails(id: number): Observable<IUser> {
+    return this.http.get<IUser>(this.API_URL + id + '/all', httpOptions);
+  }
+
+  getUserDetailsById(id: number): Observable<any> {
+    return this.http.get(this.API_URL + id +'/details', httpOptions);
   }
 
   updateUser(id: number, userData: UpdatePost): Observable<UpdateResp> {
