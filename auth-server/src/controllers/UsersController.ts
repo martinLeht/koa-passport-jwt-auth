@@ -3,7 +3,7 @@ import {Inject, Singleton} from 'typescript-ioc';
 import UsersRepository from '../repositories/UsersRepository';
 import HelperService from "../services/HelperService";
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../Config/Config';
+import { JWT_SECRET, CLIENT_URL } from '../Config/Config';
 import passport from "koa-passport";
 import User from "../models/User";
 import { TokenGenerator } from 'ts-token-generator';
@@ -100,6 +100,7 @@ export default class UsersController {
 
 
     public async getUser(ctx: IRouterContext) {
+        console.log("IN CONTROLLER getUser()")
         const id = parseInt(ctx.params.id);
         let user = await this.usersRepository.findById(id);
         
@@ -118,8 +119,7 @@ export default class UsersController {
         if (!userWithDetails) ctx.throw(404);
 
         let user: User = Object.assign(new User(), userWithDetails);
-        const userDetails = Object.assign(new UserDetails(), userWithDetails);
-        user.detailsId = userDetails;
+        const userDetails: UserDetails = Object.assign(new UserDetails(), userWithDetails);
         console.log(user);
         console.log(userDetails);
 
@@ -144,28 +144,28 @@ export default class UsersController {
     public async modifyUser(ctx: IRouterContext) {
         const id = parseInt(ctx.params.id);
         const data = ctx.request.body;
-        console.log(id);
-        console.log(data);
+
         let user = await this.usersRepository.findById(id);
+        let userDetails = await this.userDetailsRepository.findById(id);
 
         if (!user) ctx.throw(404, "User not found!");
         
-        let userDetails: UserDetails = new UserDetails();
-        if (data.firstname !== undefined) userDetails.firstName = data.firstname;
-        if (data.lastname !== undefined) userDetails.lastName = data.lastname;
-        if (data.hood !== undefined) userDetails.suburb = data.hood;
-        if (data.zip !== undefined) userDetails.zipcode = data.zip;
-        
-        if ('firstName' in userDetails || 'lastName' in userDetails || 
-            'suburb'in userDetails || 'zipcode' in userDetails) {
-            if (user.details_id === undefined || user.details_id === null) {
-                const detailsId: number = await this.userDetailsRepository.insert(userDetails);
-                console.log("Inserted details id: " + detailsId);
-                data.detailsId = detailsId;
-            } else {
-                console.log("Updating");
-                await this.userDetailsRepository.update(id, userDetails);
-            }
+        if (userDetails === undefined) {
+            let detailsData: UserDetails = new UserDetails();
+            detailsData.userId = user.id;
+            if (data.firstname !== undefined) detailsData.firstName = data.firstname;
+            if (data.lastname !== undefined) detailsData.lastName = data.lastname;
+            if (data.hood !== undefined) detailsData.suburb = data.hood;
+            if (data.zip !== undefined) detailsData.zipcode = data.zip;
+            const detailsId: number = await this.userDetailsRepository.insert(detailsData);
+            console.log("Inserted details id: " + detailsId);
+        } else {
+            if (data.firstname !== undefined) userDetails.firstName = data.firstname;
+            if (data.lastname !== undefined) userDetails.lastName = data.lastname;
+            if (data.hood !== undefined) userDetails.suburb = data.hood;
+            if (data.zip !== undefined) userDetails.zipcode = data.zip;
+            console.log("Updating details for user with id: " + userDetails.userId);
+            await this.userDetailsRepository.update(user.id, userDetails);
         }
         
         await this.usersRepository.update(id, data);
@@ -184,7 +184,7 @@ export default class UsersController {
         const id = parseInt(ctx.params.id);
         const user = await this.usersRepository.findById(id);
         if (!user) ctx.throw(404);
-
+       
         await this.usersRepository.delete(id);
         console.log("Successfully deleted user!");
         ctx.body = {
@@ -205,7 +205,7 @@ export default class UsersController {
             ctx.body = {
                 success: 'Email has been verified and user account activated!'
             };
-            ctx.redirect('http://localhost:4200/login');
+            ctx.redirect(CLIENT_URL + '/login');
         } else {
             ctx.body = {
                 error: 'Activation tokens did not match!'

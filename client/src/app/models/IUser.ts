@@ -5,5 +5,6 @@ export interface IUser {
   username: string,
   email: string,
   active: number,
-  details?: IUserDetails
+  details?: IUserDetails,
+  facebookId?: number
 }

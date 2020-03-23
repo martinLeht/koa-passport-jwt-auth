@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.authService.logoutUser();
-    this.router.navigate(['/login']);
+    location.reload();
   }
   
 

@@ -7,6 +7,7 @@ import helmet = require("koa-helmet");
 import {IRouterContext} from 'koa-router';
 import {Inject} from 'typescript-ioc';
 import UsersRoutes from './routes/UsersRoutes';
+import AuthRoutes from './routes/AuthRoutes';
 import PassportConfig from "./config/PassportConfig";
 
 
@@ -15,7 +16,7 @@ const cors = require('@koa/cors');
 export class App {
 
 
-    constructor(@Inject private usersRoutes: UsersRoutes, @Inject private passportConfig: PassportConfig) {
+    constructor(@Inject private usersRoutes: UsersRoutes, @Inject private authRoutes: AuthRoutes, @Inject private passportConfig: PassportConfig) {
 
     }
 
@@ -24,6 +25,7 @@ export class App {
         const router: Router = new Router();
         await this.passportConfig.initializePassportConfig();
         this.usersRoutes.register(router);
+        this.authRoutes.register(router);
 
 
 
@@ -56,7 +58,7 @@ export class App {
 
     public async start() {
         const app = await this.createApp();
-        const port = process.env.PORT || 3000;
+        const port = process.env.PORT || 3003;
         const server = app.listen(port);
         console.log('Server started listening on port: ' + port);
         return Promise.resolve(server);

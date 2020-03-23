@@ -12,7 +12,9 @@ import { MatMenuModule, MatTableModule } from '@angular/material/';
 
 import { AuthService } from './services/auth.service';
 import { authInterceptorProviders } from './helpers/auth.interceptor';
+//import { errorInterceptorProviders } from './helpers/error.interceptor';
 import { UsersListComponent } from './components/users-list/users-list.component';
+
 
 @NgModule({
   declarations: [
@@ -27,7 +29,7 @@ import { UsersListComponent } from './components/users-list/users-list.component
     MatTableModule,
     HttpClientModule
   ],
-  providers: [AuthService, authInterceptorProviders],
+  providers: [AuthService, authInterceptorProviders /*, errorInterceptorProviders*/],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

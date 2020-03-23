@@ -1,0 +1,12 @@
+{
+    "/auth/*": {
+        "target": "http://localhost:3003",
+        "secure": false,
+        "logLevel": "debug"
+    },
+    "/users/*": {
+        "target": "http://localhost:3003",
+        "secure": false,
+        "logLevel": "debug"
+    }
+}

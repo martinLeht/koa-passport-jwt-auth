@@ -51,7 +51,7 @@ export class EmailService {
     public async sendEmailVerification(toEmail: string, activationToken: string, userId: number) {
         return new Promise<any>((resolve, reject) => {
 
-            const activationUrl = new URL('http://localhost:3000/users/' + userId + '/verify?activationToken=' + activationToken);
+            const activationUrl = new URL('http://localhost:3003/users/' + userId + '/verify?activationToken=' + activationToken);
             const message = "<html><body>" +
                             "<h4>Activate your user account by clicking the link below:</h4><br>" +
                             "<a href='" + activationUrl.toString() + "'>Verify and activate user account</a>" +
