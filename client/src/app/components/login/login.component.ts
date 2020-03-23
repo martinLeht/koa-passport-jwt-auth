@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { IUser } from 'src/app/models/IUser';
 
 
 @Component({
@@ -28,7 +29,7 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder, 
     private authService: AuthService, 
     private tokenStorage: TokenStorageService
-  ) { 
+  ) {
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
       this.router.navigate(['/']);
@@ -49,7 +50,22 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isLoggedIn = false;
+    // Checks query params from server on facebook auth
+    this.route.queryParams.subscribe((params: Params) => {
+      if (params['jwt'] && params['id']) {
+        this.isLoggedIn = true;
+        this.tokenStorage.saveToken(params['jwt']);
+        const user: IUser = {
+          id: params['id'],
+          username: params['username'],
+          email: params['email'],
+          active: (params['active'] == 'true') ? 1 : 0
+        };
+        this.tokenStorage.saveUser(user);
+        this.reloadPage();
+      }
+    });
+
     // Init login form
     this.loginForm = this.fb.group({
       email: ['', [
@@ -65,6 +81,7 @@ export class LoginComponent implements OnInit {
       ]
     ],
     });
+    this.isLoggedIn = false;
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
@@ -110,7 +127,7 @@ export class LoginComponent implements OnInit {
   }
 
   reloadPage() {
-    window.location.reload();
+    location.reload();
   }
 
 }

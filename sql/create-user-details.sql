@@ -1,30 +1,32 @@
 use capstonedb;
 
-DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS UserDetails;
-
-
-CREATE TABLE UserDetails (
-    `details_id` INT NOT NULL AUTO_INCREMENT,
-    `first_name` VARCHAR(100),
-    `last_name` VARCHAR(100),
-    `suburb` VARCHAR(100), 
-	`zipcode` INT(10),
-    PRIMARY KEY (details_id)
-);
+DROP TABLE IF EXISTS Users;
 
 
 CREATE TABLE Users (
-	`id` INT NOT NULL AUTO_INCREMENT, 
-    `details_id` INT,
+	`id` INT NOT NULL AUTO_INCREMENT,
+    `facebook_id` BIGINT,
     `username` VARCHAR(100) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
     `password` VARCHAR(100) NOT NULL,
 	`activationToken` VARCHAR(24),
 	`active` BOOLEAN NOT NULL DEFAULT 0,
-    PRIMARY KEY (id),
-    CONSTRAINT FK_UserDetails FOREIGN KEY (details_id)
-    REFERENCES UserDetails(details_id)
+    PRIMARY KEY (id)
+    -- CONSTRAINT FK_UserDetails FOREIGN KEY (details_id)
+    -- REFERENCES UserDetails(details_id)
+    -- ON DELETE CASCADE
+);
+
+CREATE TABLE UserDetails (
+	`user_id` INT NOT NULL,
+    `details_id` INT NOT NULL AUTO_INCREMENT,
+    `first_name` VARCHAR(100),
+    `last_name` VARCHAR(100),
+    `suburb` VARCHAR(100), 
+	`zipcode` INT(10),
+    PRIMARY KEY (details_id),
+    CONSTRAINT FK_Users FOREIGN KEY (user_id) REFERENCES Users(id)
     ON DELETE CASCADE
 );
 

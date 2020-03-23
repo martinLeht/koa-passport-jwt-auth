@@ -1,4 +1,5 @@
 export interface IUserDetails {
+    userId?: number;
     detailsId?: number;
     firstName?: string;
     lastName?: string;

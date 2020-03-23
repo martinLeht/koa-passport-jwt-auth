@@ -81,9 +81,10 @@ export class ProfileComponent implements OnInit {
   }
 
   initUserData() {
-    let id: number = this.tokenStorage.getCurrentUser().id;
-    this.usernameVal = this.tokenStorage.getCurrentUser().username;
-    this.emailVal = this.tokenStorage.getCurrentUser().email;
+    let currentUser: IUser = this.tokenStorage.getCurrentUser();
+    let id: number = currentUser.id;
+    this.usernameVal = currentUser.username;
+    this.emailVal = currentUser.email;
 
     this.userService.getUserDetailsById(id).subscribe(
       data => {
@@ -101,7 +102,6 @@ export class ProfileComponent implements OnInit {
         });
       },
       error => {
-        console.log(error);
         if (error.status !== 404) {
           this.clearAlerts();
           this.alerts.get('error').push('Something went wrong, try again!');
@@ -139,7 +139,7 @@ export class ProfileComponent implements OnInit {
       this.userService.deleteUser(id).subscribe(
         (res) => {
           this.tokenStorage.signOut();
-          this.router.navigate(['/login'], { state: { success: res.success }});
+          location.reload();
         },
         error => {
           console.log(error);

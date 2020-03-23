@@ -4,10 +4,10 @@ import UsersRepository from './UsersRepository';
 import UserDetails from '../models/UserDetails';
 
 const SELECT_ALL =
-    'ud.details_id, ud.first_name, ud.last_name, ud.suburb, ud.zipcode';
+    'ud.user_id, ud.details_id, ud.first_name, ud.last_name, ud.suburb, ud.zipcode';
 
 const COLUMNS = [
-    'details_id', 'first_name', 'last_name', 'suburb', "zipcode"
+    'user_id', 'details_id', 'first_name', 'last_name', 'suburb', "zipcode"
 ];
 
 
@@ -30,16 +30,15 @@ export default class UserDetailsRepository {
     }
 
     public async findById(id: number) {
-        const users = await this.db.find({
-            sql: 'SELECT ' + SELECT_ALL + ' FROM Users u ' +
-                 'INNER JOIN UserDetails ud ON u.details_id = ud.details_id ' + 
-                 'WHERE u.id = ' + id,
+        const userDetails = await this.db.find({
+            sql: 'SELECT ' + SELECT_ALL + ' FROM UserDetails ud ' +
+                 'WHERE ud.user_id = ' + id,
             columns: COLUMNS
         });
 
-        if (users.length === 0) return undefined;
+        if (userDetails.length === 0) return undefined;
 
-        return users[0];
+        return userDetails[0];
     }
 
     public async insert(obj: UserDetails) {
@@ -47,13 +46,50 @@ export default class UserDetailsRepository {
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection().then(connection => {
                 const detailsData = [];
+                if (obj.userId !== undefined) detailsData.push(obj.userId);
                 if (obj.firstName !== undefined) detailsData.push(obj.firstName);
                 if (obj.lastName !== undefined) detailsData.push(obj.lastName);
                 if (obj.suburb !== undefined) detailsData.push(obj.suburb);
                 if (obj.zipcode !== undefined) detailsData.push(obj.zipcode);
 
-                let sql = 'INSERT INTO UserDetails (first_name, last_name, suburb, zipcode) VALUES (?,?,?,?)';
+                let sqlValues = '';
+                let entryData = '';
 
+                if (obj.userId !== undefined) {
+                    sqlValues += 'user_id, ';
+                    entryData += '?, '
+                }
+                if (obj.firstName !== undefined) {
+                    sqlValues += 'first_name, ';
+                    entryData += '?, '
+                }
+                if (obj.lastName !== undefined) {
+                     sqlValues += 'last_name, ';
+                     entryData += '?, '
+                }
+                if (obj.suburb !== undefined) {
+                    sqlValues += 'suburb, ';
+                    entryData += '?, '
+                }
+                if (obj.zipcode !== undefined) {
+                    sqlValues += 'zipcode, ';
+                    entryData += '?, '
+                }
+
+                if (sqlValues.substr(-2) === ', ') {
+                    sqlValues = sqlValues.substr(0, sqlValues.length - 2);
+                    entryData = entryData.substr(0, entryData.length - 2);
+                } else {
+                    resolve();
+                    connection.release();
+                    return;
+                }
+
+                let sql = 'INSERT INTO UserDetails (' + sqlValues + ') VALUES (' + entryData + ')';
+                console.log("Data to save: ");
+                for (let i = 0; i < detailsData.length; i++) {
+                    console.log(detailsData[i]);
+                }
                 connection.query(sql, detailsData, (err, result) => {
                     if (err) {
                         console.log(err);
@@ -76,15 +112,15 @@ export default class UserDetailsRepository {
 
                 const detailsData = [];
                 
+                if (obj.userId !== undefined) detailsData.push(obj.userId);
                 if (obj.firstName !== undefined) detailsData.push(obj.firstName);
                 if (obj.lastName !== undefined) detailsData.push(obj.lastName);
                 if (obj.suburb !== undefined) detailsData.push(obj.suburb);
                 if (obj.zipcode !== undefined) detailsData.push(obj.zipcode);
                 detailsData.push(id);
 
-                let sql = 'UPDATE UserDetails ud ' +
-                          'INNER JOIN Users u ON u.details_id = ud.details_id ' +
-                          'SET ';
+                let sql = 'UPDATE UserDetails ud SET ';
+                if (obj.userId !== undefined) sql += 'ud.user_id = ?, ';
                 if (obj.firstName !== undefined) sql += 'ud.first_name = ?, ';
                 if (obj.lastName !== undefined) sql += 'ud.last_name = ?, ';
                 if (obj.suburb !== undefined) sql += 'ud.suburb = ?, ';
@@ -98,7 +134,7 @@ export default class UserDetailsRepository {
                     return;
                 }
 
-                sql += ' WHERE u.id = ?';
+                sql += ' WHERE ud.user_id = ?';
 
                 connection.query(sql, detailsData, (err, result) => {
                     if (err) {
@@ -117,7 +153,7 @@ export default class UserDetailsRepository {
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection
             ().then(connection => {
-                let sql = 'DELETE FROM UserDetails WHERE details_id = ' + id;
+                let sql = 'DELETE FROM UserDetails WHERE user_id = ' + id;
 
                 connection.query(sql, (err, result) => {
                     if (err) {
