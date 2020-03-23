@@ -2,6 +2,18 @@
     <mat-card class="register-card">
         <mat-card-title>Register</mat-card-title>
         <mat-card-content>
+            <div *ngIf="alerts != undefined" id="alerts">
+                <div *ngIf="alerts.get('success').length > 0" >
+                    <p *ngFor="let successMsg of alerts.get('success')" class="alert-success">
+                        {{successMsg}}
+                    </p>
+                </div>
+                <div *ngIf="alerts.get('error').length > 0">
+                    <p *ngFor="let errorMsg of alerts.get('error')" class="alert-error">
+                        {{errorMsg}}
+                    </p>
+                </div>
+            </div>
             <!--<form [formGroup]="registerForm" [hidden]="success">-->
             <form [formGroup]="registerForm" (ngSubmit)="registerUser()">
                 <mat-form-field appearance="fill">
