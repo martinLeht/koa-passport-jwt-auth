@@ -50,3 +50,36 @@ mat-form-field{
     width: 50%;
     margin: auto;
 }
+
+.alert-error {
+    height: auto;
+    line-height: normal;
+    text-align: center;
+    max-width: 100%;
+    width: 100%;
+    color: rgb(139, 0, 0);
+    border: rgb(139, 0, 0);
+    background-color: rgb(255, 153, 153);
+    border-radius: 0.5em;
+    padding: 5px;
+    margin-top: -10px;
+}
+
+.alert-success {
+    height: auto;
+    line-height: normal;
+    text-align: center;
+    max-width: 100%;
+    width: 100%;
+    color: rgb(46, 139, 87);
+    border: rgb(46, 139, 87);
+    background-color: rgb(166, 242, 166);
+    border-radius: 0.5em;
+    padding: 5px;
+    margin-top: -10px;
+} 
+
+#alerts {
+    max-width: 100%;
+    width: 100%;
+}

@@ -17,6 +17,8 @@ export class RegisterComponent implements OnInit {
   loading = false;
   success = false;
 
+  alerts: Map<string, Array<string>>;
+
   constructor(
     private router: Router,
     private fb: FormBuilder,
@@ -29,6 +31,9 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.alerts = new Map();
+    this.alerts.set('success', []);
+    this.alerts.set('error', []);
     // Init register form
     this.registerForm = this.fb.group({
       email: ['', [
@@ -41,7 +46,7 @@ export class RegisterComponent implements OnInit {
         Validators.required,
         Validators.minLength(8),
         Validators.maxLength(32),
-        Validators.pattern('^(?=.*[0-9])(?=[a-zA-Z])([a-zA-Z0-9]+)$')//([ !#,-_&\$\.\?+]) special chars
+        Validators.pattern('^[a-zA-Z0-9!@#$&()\\-`.+,/\"]*$')/*BEFORE '^(?=.*[0-9])(?=[a-zA-Z])([a-zA-Z0-9]+)$'*/ //special chars([ !#,-_&\$\.\?+]) 
       ]
     ],
     })
@@ -58,12 +63,23 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.get('password');
   }
 
+  clearAlerts() {
+    this.alerts.clear();
+    this.alerts.set('success', []);
+    this.alerts.set('error', []);
+  }
+
   registerUser() {
-    this.userService.register(this.registerForm.value).subscribe((res) => {
-      if (res.success) {
+    this.userService.register(this.registerForm.value).subscribe(
+      (res) => {
+        if (res.success) {
+          this.registerForm.reset();
+          this.router.navigate(['/login'], { state: { success: res.success } });
+        }
+      }, err => {
+        this.clearAlerts();
+        this.alerts.get('error').push(err.error.error);
         this.registerForm.reset();
-        this.router.navigate(['/login'], { state: { success: res.success } });
-      }
     });
   }
 

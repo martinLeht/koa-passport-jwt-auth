@@ -33,7 +33,7 @@ export default class UsersController {
 
         const userExists = await this.usersRepository.findByEmail(data.email);
 
-        if (userExists) ctx.throw('Username already exists', 409);
+        if (userExists) ctx.throw('User with provided email already exists', 409);
 
         data.password = await this.helperService.hashPassword(data.password);
 
