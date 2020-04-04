@@ -88,8 +88,8 @@ export class ProfileComponent implements OnInit {
 
     this.userService.getUserDetailsById(id).subscribe(
       data => {
-        this.firstnameVal = data.details.first_name;
-        this.lastnameVal = data.details.last_name;
+        this.firstnameVal = data.details.firstName;
+        this.lastnameVal = data.details.lastName;
         this.hoodVal = data.details.suburb;
         this.zipVal = data.details.zipcode;
         this.profileForm.patchValue({

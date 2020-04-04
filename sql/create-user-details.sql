@@ -1,6 +1,7 @@
 use capstonedb;
 
 DROP TABLE IF EXISTS UserDetails;
+DROP TABLE IF EXISTS JwtRefreshTokens;
 DROP TABLE IF EXISTS Users;
 
 
@@ -13,9 +14,6 @@ CREATE TABLE Users (
 	`activationToken` VARCHAR(24),
 	`active` BOOLEAN NOT NULL DEFAULT 0,
     PRIMARY KEY (id)
-    -- CONSTRAINT FK_UserDetails FOREIGN KEY (details_id)
-    -- REFERENCES UserDetails(details_id)
-    -- ON DELETE CASCADE
 );
 
 CREATE TABLE UserDetails (
@@ -27,6 +25,16 @@ CREATE TABLE UserDetails (
 	`zipcode` INT(10),
     PRIMARY KEY (details_id),
     CONSTRAINT FK_Users FOREIGN KEY (user_id) REFERENCES Users(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE JwtRefreshTokens (
+	`token_id` INT NOT NULL AUTO_INCREMENT,
+	`uuid` VARCHAR(36) NOT NULL,
+    `user_id` INT NOT NULL,
+    `refresh_token` VARCHAR(255),
+    PRIMARY KEY (token_id, uuid),
+    CONSTRAINT FK_Users_JWT FOREIGN KEY (user_id) REFERENCES Users(id)
     ON DELETE CASCADE
 );
 

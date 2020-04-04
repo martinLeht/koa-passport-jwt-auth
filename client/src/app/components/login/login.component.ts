@@ -52,9 +52,10 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     // Checks query params from server on facebook auth
     this.route.queryParams.subscribe((params: Params) => {
-      if (params['jwt'] && params['id']) {
+      if (params['jwt'] && params['refreshToken'] && params['id']) {
         this.isLoggedIn = true;
         this.tokenStorage.saveToken(params['jwt']);
+        this.tokenStorage.saveRefreshToken(params['refreshToken']);
         const user: IUser = {
           id: params['id'],
           username: params['username'],
@@ -99,7 +100,8 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.authService.loginUser(this.loginForm.value).subscribe(
       data => {
-        this.tokenStorage.saveToken(data.token);
+        this.tokenStorage.saveToken(data.accessToken);
+        this.tokenStorage.saveRefreshToken(data.refreshToken);
         this.tokenStorage.saveUser(data.user);
         
         this.success = true;
