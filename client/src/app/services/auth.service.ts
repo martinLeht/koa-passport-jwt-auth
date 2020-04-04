@@ -4,11 +4,18 @@ import { Observable } from 'rxjs';
 
 import { IUser } from '../models/IUser';
 import { TokenStorageService } from './token-storage.service';
+import { tap } from 'rxjs/operators';
 
 
 interface LoginResp{
   user: IUser,
-  token: string
+  accessToken: string,
+  refreshToken: string
+}
+
+interface TokenRefreshResp{
+  accessToken: string,
+  refreshToken: string
 }
 
 interface RegisterResp{
@@ -44,4 +51,15 @@ export class AuthService {
   logoutUser() {
     this.tokenStorage.signOut();
   }
+
+  refreshToken(): Observable<TokenRefreshResp> {
+    const refreshToken = this.tokenStorage.getRefreshToken(); 
+    return this.http.post<TokenRefreshResp>(this.ROOT_URL + '/refresh-token', { 
+      refreshToken }, httpOptions).pipe(
+        tap(res => {
+         this.tokenStorage.saveToken(res.accessToken);
+         this.tokenStorage.saveRefreshToken(res.refreshToken);
+        })
+      );;
+   }
 }

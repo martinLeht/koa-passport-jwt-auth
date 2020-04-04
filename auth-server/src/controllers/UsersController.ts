@@ -131,11 +131,10 @@ export default class UsersController {
 
     public async getUserDetails(ctx: IRouterContext) {
         const id = parseInt(ctx.params.id);
-        let details: UserDetails = await this.userDetailsRepository.findById(id);
+        let details: UserDetails | undefined = await this.userDetailsRepository.findById(id);
         
         if (!details) ctx.throw(404, 'No details found for the user with id ' + id);
 
-        console.log(details);
         ctx.body = {
             details: details
         };

@@ -1,26 +1,27 @@
 import {IRouterContext} from 'koa-router';
 import {Inject, Singleton} from 'typescript-ioc';
+import { uuid } from 'uuidv4';
 import UsersRepository from '../repositories/UsersRepository';
 import HelperService from "../services/HelperService";
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, CLIENT_URL } from '../Config/Config';
+import { CLIENT_URL } from '../Config/Config';
 import passport from "koa-passport";
 import User from "../models/User";
 import { Next } from "koa";
 import UserDetailsRepository from '../repositories/UserDetailsRepository';
+import JwtRefreshTokenRepository from '../repositories/JwtRefreshTokenRepository';
+import JwtService from '../services/JwtService';
 
 
 
 @Singleton
 export default class AuthController {
 
-    constructor(@Inject private usersRepository: UsersRepository,
-                @Inject private helperService: HelperService,
-                @Inject private userDetailsRepository: UserDetailsRepository) {
+    constructor(@Inject private jwtService: JwtService) {
     }
 
     public async loginUser(ctx: IRouterContext, next: Next) {
-        return passport.authenticate('login', (err, user: User, info) => {
+        return passport.authenticate('login', async (err, user: User, info) => {
             if (err) {
                 console.log(err);
                 next();
@@ -35,7 +36,14 @@ export default class AuthController {
                     
                 }
 
-                const token = jwt.sign({ id: user.id}, JWT_SECRET);
+                const payload = {
+                    id: user.id
+                };
+
+                const accessToken = this.jwtService.getJwtToken(payload);
+                const refreshToken = await this.jwtService.getRefreshToken(payload);
+                console.log('Access token: ' + accessToken);
+                console.log('Refresh token: ' + refreshToken);
                 console.log("Successfully logged in!");
                 ctx.body = {
                     user: {
@@ -44,7 +52,8 @@ export default class AuthController {
                         email: user.email,
                         active: user.active
                     },
-                    token: token
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
                 }
             }
         })(ctx, next);
@@ -56,7 +65,7 @@ export default class AuthController {
     }
 
     public async loginFacebookCallback(ctx: IRouterContext, next: Next) {
-        return passport.authenticate('facebook', { session: false }, (err, user: User, info) => {
+        return passport.authenticate('facebook', { session: false }, async (err, user: User, info) => {
             if (err) {
                 console.log(err);
                 next();
@@ -71,23 +80,35 @@ export default class AuthController {
                     
                 }
 
-                const token = jwt.sign({ id: user.id }, JWT_SECRET);
+                const payload = {
+                    id: user.id
+                };
+
+                const accessToken = this.jwtService.getJwtToken(payload);
+                const refreshToken = await this.jwtService.getRefreshToken(payload);
+                console.log('Access token: ' + accessToken);
+                console.log('Refresh token: ' + refreshToken);
                 console.log("Successfully logged in with facebook!");
-                ctx.redirect(CLIENT_URL + '/login?jwt=' + token + '&id=' + user.id.toString() + '&username=' + user.username + '&email=' + user.email + '&active=' + true);
-                /*
-                ctx.body = {
-                    user: {
-                        id: user.id,
-                        detailsId: user.detailsId,
-                        facebookId: user.facebookId,
-                        username: user.username,
-                        email: user.email,
-                        active: user.active
-                    },
-                    token: token
-                }
-                */
+                ctx.redirect(CLIENT_URL + '/login?jwt=' + accessToken + '&refreshToken=' + refreshToken + 
+                            '&id=' + user.id.toString() + '&username=' + user.username + '&email=' + user.email + '&active=' + true);
             }
         })(ctx, next);
+    }
+
+    public async refreshJwtToken(ctx: IRouterContext) {
+        const refreshToken: string = ctx.request.body.refreshToken; 
+        if (!refreshToken) {
+            return ctx.throw(403, 'Access is forbidden');
+        } 
+        try {
+            const newTokens = await this.jwtService.refreshToken(refreshToken);
+            ctx.body = {
+                accessToken: newTokens.accessToken,
+                refreshToken: newTokens.refreshToken
+            }
+        } catch (err) {
+            const message = (err && err.message) || err;
+            ctx.throw(403, message);
+        }
     }
 }

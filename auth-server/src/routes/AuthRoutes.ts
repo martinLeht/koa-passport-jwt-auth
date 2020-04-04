@@ -15,7 +15,8 @@ export default class AuthRoutes extends IRoutes {
         return [
             Route.newRoute('/auth/login', 'post', (ctx: IRouterContext, next: Next) => this.authController.loginUser(ctx, next), true),
             Route.newRoute('/auth/facebook', 'get', (ctx: IRouterContext, next: Next) => this.authController.loginFacebook(ctx, next), true),
-            Route.newRoute('/auth/facebook/callback', 'get', (ctx: IRouterContext, next: Next) => this.authController.loginFacebookCallback(ctx, next), true)
+            Route.newRoute('/auth/facebook/callback', 'get', (ctx: IRouterContext, next: Next) => this.authController.loginFacebookCallback(ctx, next), true),
+            Route.newRoute('/auth/refresh-token', 'post', (ctx: IRouterContext, next: Next) => this.authController.refreshJwtToken(ctx), true)
         ];
     }
 

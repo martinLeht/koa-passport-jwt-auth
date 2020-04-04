@@ -1,5 +1,3 @@
-import UserDetails from "./UserDetails";
-
 export default class User {
     id!: number;
     facebook_id?: number;

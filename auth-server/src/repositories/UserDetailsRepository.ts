@@ -2,6 +2,7 @@ import {Inject, Singleton} from 'typescript-ioc';
 import DatabaseService from '../services/DatabaseService';
 import UsersRepository from './UsersRepository';
 import UserDetails from '../models/UserDetails';
+import User from '../models/User';
 
 const SELECT_ALL =
     'ud.user_id, ud.details_id, ud.first_name, ud.last_name, ud.suburb, ud.zipcode';
@@ -23,10 +24,11 @@ export default class UserDetailsRepository {
             columns: COLUMNS
         });
 
-        for (let detail of userDetails) {
-            console.log(detail);
-        }
-        return userDetails;
+        if (userDetails.length === 0) return undefined;
+
+        const parsedUserDetails: UserDetails[] = userDetails.map(details => this.parse(details));
+
+        return parsedUserDetails;
     }
 
     public async findById(id: number) {
@@ -38,7 +40,9 @@ export default class UserDetailsRepository {
 
         if (userDetails.length === 0) return undefined;
 
-        return userDetails[0];
+        const parsedUserDetails: UserDetails = this.parse(userDetails[0]);
+
+        return parsedUserDetails;
     }
 
     public async insert(obj: UserDetails) {
@@ -46,34 +50,33 @@ export default class UserDetailsRepository {
         return new Promise<any>((resolve, reject) => {
             this.db.getConnection().then(connection => {
                 const detailsData = [];
-                if (obj.userId !== undefined) detailsData.push(obj.userId);
-                if (obj.firstName !== undefined) detailsData.push(obj.firstName);
-                if (obj.lastName !== undefined) detailsData.push(obj.lastName);
-                if (obj.suburb !== undefined) detailsData.push(obj.suburb);
-                if (obj.zipcode !== undefined) detailsData.push(obj.zipcode);
-
                 let sqlValues = '';
                 let entryData = '';
 
                 if (obj.userId !== undefined) {
+                    detailsData.push(obj.userId);
                     sqlValues += 'user_id, ';
-                    entryData += '?, '
+                    entryData += '?, ';
                 }
                 if (obj.firstName !== undefined) {
+                    detailsData.push(obj.firstName);
                     sqlValues += 'first_name, ';
-                    entryData += '?, '
+                    entryData += '?, ';
                 }
                 if (obj.lastName !== undefined) {
-                     sqlValues += 'last_name, ';
-                     entryData += '?, '
+                    detailsData.push(obj.lastName);
+                    sqlValues += 'last_name, ';
+                    entryData += '?, ';
                 }
                 if (obj.suburb !== undefined) {
+                    detailsData.push(obj.suburb);
                     sqlValues += 'suburb, ';
-                    entryData += '?, '
+                    entryData += '?, ';
                 }
                 if (obj.zipcode !== undefined) {
+                    detailsData.push(obj.zipcode);
                     sqlValues += 'zipcode, ';
-                    entryData += '?, '
+                    entryData += '?, ';
                 }
 
                 if (sqlValues.substr(-2) === ', ') {
@@ -111,20 +114,29 @@ export default class UserDetailsRepository {
             this.db.getConnection().then(connection => {
 
                 const detailsData = [];
-                
-                if (obj.userId !== undefined) detailsData.push(obj.userId);
-                if (obj.firstName !== undefined) detailsData.push(obj.firstName);
-                if (obj.lastName !== undefined) detailsData.push(obj.lastName);
-                if (obj.suburb !== undefined) detailsData.push(obj.suburb);
-                if (obj.zipcode !== undefined) detailsData.push(obj.zipcode);
-                detailsData.push(id);
-
                 let sql = 'UPDATE UserDetails ud SET ';
-                if (obj.userId !== undefined) sql += 'ud.user_id = ?, ';
-                if (obj.firstName !== undefined) sql += 'ud.first_name = ?, ';
-                if (obj.lastName !== undefined) sql += 'ud.last_name = ?, ';
-                if (obj.suburb !== undefined) sql += 'ud.suburb = ?, ';
-                if (obj.zipcode !== undefined) sql += 'ud.zipcode = ?, ';
+                
+                if (obj.userId !== undefined) {
+                    detailsData.push(obj.userId);
+                    sql += 'ud.user_id = ?, ';
+                } 
+                if (obj.firstName !== undefined) {
+                    detailsData.push(obj.firstName);
+                    sql += 'ud.first_name = ?, ';
+                }
+                if (obj.lastName !== undefined) {
+                    detailsData.push(obj.lastName);
+                    sql += 'ud.last_name = ?, ';
+                }
+                if (obj.suburb !== undefined) {
+                    detailsData.push(obj.suburb);
+                    sql += 'ud.suburb = ?, ';
+                }
+                if (obj.zipcode !== undefined) {
+                    detailsData.push(obj.zipcode);
+                    sql += 'ud.zipcode = ?, ';
+                }
+                detailsData.push(id);
 
                 if (sql.substr(-2) === ', ') {
                     sql = sql.substr(0, sql.length - 2);
@@ -169,16 +181,14 @@ export default class UserDetailsRepository {
         });
     }
 
-    private parse(row: any): any {
-        console.log("IN PARSE");
-        console.log(row);
+    private parse(row: any): UserDetails {
         return {
-            id: row.id,
-            username: JSON.parse(row.username),
-            email: JSON.parse(row.email),
-            password: JSON.parse(row.password),
-            activationToken: JSON.parse(row.activationToken),
-            active: row.active
+            userId: row.user_id,
+            detailsId: row.details_id,
+            firstName: row.first_name,
+            lastName: row.last_name,
+            suburb: row.suburb,
+            zipcode: row.zipcode
         };
     }
 
