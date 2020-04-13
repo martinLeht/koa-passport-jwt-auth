@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute, 
     private fb: FormBuilder, 
-    private authService: AuthService, 
+    public authService: AuthService, 
     private tokenStorage: TokenStorageService
   ) {
     if (this.tokenStorage.getToken()) {
