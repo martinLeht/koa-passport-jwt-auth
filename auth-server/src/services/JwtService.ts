@@ -30,7 +30,7 @@ export default class JwtService {
             await this.jwtRefreshTokenRepository.delete(payload.id);
             console.log("Deleted tokens of user with id: " + payload.id);
         }
-        const generatedRefreshToken = jwt.sign({ user: payload.id }, JWT_SECRET, { expiresIn: '3min' });
+        const generatedRefreshToken = jwt.sign({ user: payload.id }, JWT_SECRET, { expiresIn: '1d' });
         await this.jwtRefreshTokenRepository.insert({
             uuid: uuid(),
             userId: payload.id,
@@ -45,7 +45,7 @@ export default class JwtService {
      * @param payload pauload data to the jwt token
      */
     public getJwtToken(payload: { id: number }) {
-        return jwt.sign({ id: payload.id }, JWT_SECRET, { expiresIn: '1min' });
+        return jwt.sign({ id: payload.id }, JWT_SECRET, { expiresIn: '15min' });
     }
     
     /**
@@ -97,7 +97,7 @@ export default class JwtService {
      */
     public async getUpdatedRefreshToken(payload: any): Promise<string> {
         return new Promise<string>(async (resolve, reject) => {
-            const newRefreshToken: string = jwt.sign({user: payload.id}, JWT_SECRET, { expiresIn: '3min' });
+            const newRefreshToken: string = jwt.sign({user: payload.id}, JWT_SECRET, { expiresIn: '1d' });
             try {
                 await this.jwtRefreshTokenRepository.update(payload.id, { refreshToken: newRefreshToken });
                 resolve(newRefreshToken);
