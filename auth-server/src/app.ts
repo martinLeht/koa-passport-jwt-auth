@@ -9,6 +9,7 @@ import {Inject} from 'typescript-ioc';
 import UsersRoutes from './routes/UsersRoutes';
 import AuthRoutes from './routes/AuthRoutes';
 import PassportConfig from "./config/PassportConfig";
+import ReviewsRoutes from './routes/ReviewsRoutes';
 
 
 const cors = require('@koa/cors');
@@ -16,7 +17,10 @@ const cors = require('@koa/cors');
 export class App {
 
 
-    constructor(@Inject private usersRoutes: UsersRoutes, @Inject private authRoutes: AuthRoutes, @Inject private passportConfig: PassportConfig) {
+    constructor(@Inject private usersRoutes: UsersRoutes, 
+                @Inject private authRoutes: AuthRoutes, 
+                @Inject private reviewsRoutes: ReviewsRoutes,
+                @Inject private passportConfig: PassportConfig) {
 
     }
 
@@ -26,6 +30,7 @@ export class App {
         await this.passportConfig.initializePassportConfig();
         this.usersRoutes.register(router);
         this.authRoutes.register(router);
+        this.reviewsRoutes.register(router);
 
 
 
