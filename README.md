@@ -359,6 +359,9 @@ POST /reviews/
 ```http
 PUT /reviews/2
 ```
+
+* Mandatory Request data: ratings
+* Optional Request data: title, text
 * JSON Request body:
 ```json
 {
