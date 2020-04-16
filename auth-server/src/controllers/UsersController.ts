@@ -102,7 +102,6 @@ export default class UsersController {
 
 
     public async getUser(ctx: IRouterContext) {
-        console.log("IN CONTROLLER getUser()")
         const id = parseInt(ctx.params.id);
         let user = await this.usersRepository.findById(id);
         
@@ -118,9 +117,6 @@ export default class UsersController {
         const id = parseInt(ctx.params.id);
         let userWithDetails: User | undefined = await this.usersRepository.findByIdWithDetails(id);
         if (!userWithDetails) ctx.throw(404);
-
-        console.log(userWithDetails);
-        console.log(userWithDetails.details);
 
         const {password, activationToken, ...resultUser} = userWithDetails;
         ctx.body = {

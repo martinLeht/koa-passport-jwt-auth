@@ -1,15 +1,9 @@
 import {IRouterContext} from 'koa-router';
 import {Inject, Singleton} from 'typescript-ioc';
-import { uuid } from 'uuidv4';
-import UsersRepository from '../repositories/UsersRepository';
-import HelperService from "../services/HelperService";
-import jwt from 'jsonwebtoken';
 import { CLIENT_URL } from '../Config/Config';
 import passport from "koa-passport";
 import User from "../models/User";
 import { Next } from "koa";
-import UserDetailsRepository from '../repositories/UserDetailsRepository';
-import JwtRefreshTokenRepository from '../repositories/JwtRefreshTokenRepository';
 import JwtService from '../services/JwtService';
 
 

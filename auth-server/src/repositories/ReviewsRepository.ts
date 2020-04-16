@@ -54,6 +54,25 @@ export default class ReviewsRepository {
         return review;
     }
 
+    public async findReviewsForHood(hoodId: number) {
+        const reviews = await this.db.find({
+            sql: 'SELECT ' + SELECT_REVIEW + ' FROM Reviews re WHERE hood_id = ' + hoodId,
+            columns: COLUMNS_REVIEW
+        });
+
+        if (reviews.length === 0) return undefined;
+
+        let reviewsWithRatings: Review[] = [];
+
+        for(let review of reviews) {
+            let parsedReview: Review = this.parse(review);
+            const ratings: Rating[] | undefined = await this.ratingsRepository.findAllByReviewId(parsedReview.reviewId);
+            parsedReview.ratings = ratings;
+            reviewsWithRatings.push(parsedReview);
+        }
+        return reviewsWithRatings;
+    }
+
     public async insert(obj: {
         hoodId: number,
         userId: number,
@@ -84,11 +103,6 @@ export default class ReviewsRepository {
                         obj.text
                     ];
                     sql = 'INSERT INTO Reviews (hood_id, user_id, title, text) VALUES (?,?,?,?)';
-                }
-                
-                
-                for (let i = 0; i < reviewData.length; i++) {
-                    console.log(reviewData[i]);
                 }
 
                 connection.query(sql, reviewData, (err, result) => {
@@ -171,8 +185,6 @@ export default class ReviewsRepository {
     }
 
     private parse(row: any): Review {
-        console.log("IN PARSE");
-        console.log(row);
         const review: Review = {
             reviewId: row.review_id,
             hoodId: row.hood_id,

@@ -135,9 +135,6 @@ export default class UsersRepository {
                     ];
                     sql = 'INSERT INTO Users (username, email, password, activationToken, active) VALUES (?,?,?,?,?)';
                 }
-                for (let i = 0; i < userData.length; i++) {
-                    console.log(userData[i]);
-                }
 
                 connection.query(sql, userData, (err, result) => {
                     if (err) {
@@ -223,8 +220,6 @@ export default class UsersRepository {
     }
 
     private parse(row: any): User {
-        console.log("IN PARSE");
-        console.log(row);
         let user: User;
         if (row.details_id) {
             const userDetails: UserDetails = {
@@ -256,7 +251,6 @@ export default class UsersRepository {
                 active: row.active
             }
         }
-        console.log(user);
         return user;
     }
 

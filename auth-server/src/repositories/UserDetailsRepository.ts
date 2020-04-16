@@ -89,10 +89,7 @@ export default class UserDetailsRepository {
                 }
 
                 let sql = 'INSERT INTO UserDetails (' + sqlValues + ') VALUES (' + entryData + ')';
-                console.log("Data to save: ");
-                for (let i = 0; i < detailsData.length; i++) {
-                    console.log(detailsData[i]);
-                }
+                
                 connection.query(sql, detailsData, (err, result) => {
                     if (err) {
                         console.log(err);

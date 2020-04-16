@@ -73,7 +73,7 @@ export default class PassportConfig {
         }, async (req: any, accessToken, refreshToken, profile, done) => {
             // Checks if there is a user with the given facebook profile id
             const facebookId = parseInt(profile.id);
-            console.log(facebookId);
+            
             const existingUser = await this.usersRepository.findByFacebookProfile(facebookId);
             if (existingUser) {
                 return done(undefined, existingUser);
