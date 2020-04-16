@@ -2,12 +2,14 @@
   "name": "auth-server",
   "version": "1.0.0",
   "description": "Serverside for the authentication.",
-  "main": "server.ts",
+  "main": "dist/server.js",
   "scripts": {
-    "start:dev": "nodemon dist/server.js",
+    "start:dev": "nodemon",
     "build:dev": "tsc --watch --preserveWatchOutput",
+    "copy-cert": "xcopy .\\src\\config\\certificates .\\dist\\Config\\certificates",
     "start": "npx ts-node src/server.ts",
-    "dev": "concurrently \"npm:build:dev\" \"npm:start:dev\""
+    "dev": "concurrently \"npm:build:dev\" \"npm:start:dev\"",
+    "start-dev": "npm run copy-cert && npm run dev"
   },
   "author": "Martin Lehtomaa",
   "license": "ISC",

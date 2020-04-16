@@ -67,7 +67,7 @@ export default class UsersRepository {
     public async findByIdWithDetails(id: number) {
         const users = await this.db.find({
             sql: 'SELECT ' + SELECT_ALL + ' FROM Users u ' 
-                + 'INNER JOIN UserDetails ud ON u.id = ud.user_id '
+                + 'LEFT JOIN UserDetails ud ON u.id = ud.user_id '
                 + 'WHERE u.id = ' + id,
             columns: COLUMNS_ALL
         });

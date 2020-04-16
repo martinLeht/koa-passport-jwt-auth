@@ -41,6 +41,14 @@ cd auth-server
 npm start
 ```
 
+### Running Node Server as js files with nodemon (building ts to js files)
+
+```bash
+cd auth-server
+npm run start-dev
+```
+
+
 ### Running Angular Frontend
 
 ```bash
@@ -339,6 +347,11 @@ GET /reviews/2
         ]
     }
 }
+```
+
+GET request to fetch reviews from specific hood
+```http
+GET /reviews?hood=1
 ```
 
 POST request to create a review entry to database
@@ -691,26 +704,60 @@ DELETE /reviews/1
 
 ### Authentication
 
+POST request to login using local strategy
 ```http
 POST /auth/login
 ```
+* Mandatory data: email, password
+* JSON Request body:
+```json
+{
+"email": "frodo.baggins@lotr.com",
+"password": "test123!"
+}
+```
+* JSON Response body:
+```json
+{
+    "user": {
+        "id": 1,
+        "username": "frodo123",
+        "email": "frodo.baggins@lort.com",
+        "active": 1
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNTg3MDYzNzA5LCJleHAiOjE1ODcwNjQ2MDl9.mPKcXqaV893oyOTQZnb9nd7LflScKmoC_GVGI_wakps",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjo3LCJpYXQiOjE1ODcwNjM3MDksImV4cCI6MTU4NzE1MDEwOX0.YDDceIjXl_-iJ51Q_c17T7cLNuZjjI-DtpgTZE8zs6A"
+}
+```
 
-
+GET reqeust that redirects to facebook logging in page
 ```http
 GET /auth/facebook
 ```
 
+GET request will be called as callback when user provides facebook credentials in logging page 
 ```http
 GET /auth/facebook/callback
 ```
+* Registers user with a facebook id
+* If user already exists with the facebook id, user will just be authenticated
+* Redirects a successful login to client login page and passes tokens and user data through query params: 'localhost:4200/login?jwt=<accessToken>&refreshToken=<refreshToken>&id=<userId>&username=<username>&email=<email>&active=<true>'
+* If user with provided email exists, but does not have a facebook id (account linked with facebook), it returns JSON Response (user can not be linked with facebook account through Account settings yet):
+```json
+{ 
+    message: "There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings." 
+}
+```
 
-
+POST request to generate a new access- and refresh-token
 ```http
 POST /auth/refresh-token
 ```
-
-
-```http
-DELETE /users/1
+* JSON Response body:
+```json
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNTg3MDYzNzA5LCJleHAiOjE1ODcwNjQ2MDl9.mPKcXqaV893oyOTQZnb9nd7LflScKmoC_GVGI_wakps",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjo3LCJpYXQiOjE1ODcwNjM3MDksImV4cCI6MTU4NzE1MDEwOX0.YDDceIjXl_-iJ51Q_c17T7cLNuZjjI-DtpgTZE8zs6A"
+}
 ```
 
