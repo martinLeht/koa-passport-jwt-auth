@@ -4,7 +4,7 @@
   "description": "Serverside for the authentication.",
   "main": "server.ts",
   "scripts": {
-    "start:dev": "nodemon src/server.ts",
+    "start:dev": "nodemon dist/server.js",
     "build:dev": "tsc --watch --preserveWatchOutput",
     "start": "npx ts-node src/server.ts",
     "dev": "concurrently \"npm:build:dev\" \"npm:start:dev\""

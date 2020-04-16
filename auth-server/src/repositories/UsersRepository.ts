@@ -2,6 +2,7 @@ import {Inject, Singleton} from 'typescript-ioc';
 import DatabaseService from '../services/DatabaseService';
 import UserDetailsRepository from './UserDetailsRepository';
 import User from '../models/User';
+import UserDetails from '../models/UserDetails';
 
 const SELECT_ALL =
     'u.id, u.facebook_id, u.username, u.email, u.password, u.activationToken, u.active, ' +
@@ -32,7 +33,11 @@ export default class UsersRepository {
             sql: 'SELECT ' + SELECT_USER + ' FROM Users u',
             columns: COLUMNS_USER
         });
-        return users;
+
+        if (users.length === 0) return undefined;
+
+        const parsedUsers = users.map(user => this.parse(user));
+        return parsedUsers;
     }
 
     public async findAllWithDetails() {
@@ -41,7 +46,11 @@ export default class UsersRepository {
                  'INNER JOIN UserDetails ud ON u.id = ud.user_id',
             columns: COLUMNS_USER
         });
-        return users;
+
+        if (users.length === 0) return undefined;
+
+        const parsedUsers = users.map(user => this.parse(user));
+        return parsedUsers;
     }
 
     public async findById(id: number) {
@@ -52,7 +61,7 @@ export default class UsersRepository {
 
         if (users.length === 0) return undefined;
 
-        return users[0];
+        return this.parse(users[0]);
     }
 
     public async findByIdWithDetails(id: number) {
@@ -65,7 +74,7 @@ export default class UsersRepository {
 
         if (users.length === 0) return undefined;
 
-        return users[0];
+        return this.parse(users[0]);
     }
 
 
@@ -77,18 +86,18 @@ export default class UsersRepository {
 
         if (users.length === 0) return undefined;
 
-        return users[0];
+        return this.parse(users[0]);
     }
 
     public async findByFacebookProfile(fbProfileId: number) {
         const users = await this.db.find({
             sql: 'SELECT ' + SELECT_USER + ' FROM Users u WHERE u.facebook_id = ' + fbProfileId,
             columns: COLUMNS_USER
-        })
+        });
 
         if (users.length === 0) return undefined;
 
-        return users[0];
+        return this.parse(users[0]);
     }
 
     public async insert(obj: {
@@ -97,7 +106,7 @@ export default class UsersRepository {
         password: string,
         activationToken: string,
         active: boolean,
-        facebook_id?: number
+        facebookId?: number
     }) {
 
         return new Promise<number>((resolve, reject) => {
@@ -106,14 +115,14 @@ export default class UsersRepository {
                 let userData = [];
                 let sql = '';
 
-                if (obj.facebook_id !== undefined) {
+                if (obj.facebookId !== undefined) {
                     userData = [
                         obj.username,
                         obj.email,
                         obj.password,
                         obj.activationToken,
                         obj.active,
-                        obj.facebook_id
+                        obj.facebookId
                     ];
                     sql = 'INSERT INTO Users (username, email, password, activationToken, active, facebook_id) VALUES (?,?,?,?,?,?)';
                 } else {
@@ -216,15 +225,39 @@ export default class UsersRepository {
     private parse(row: any): User {
         console.log("IN PARSE");
         console.log(row);
-        return {
-            id: row.id,
-            facebook_id: JSON.parse(row.facebook_id),
-            username: JSON.parse(row.username),
-            email: JSON.parse(row.email),
-            password: JSON.parse(row.password),
-            activationToken: JSON.parse(row.activationToken),
-            active: row.active
-        };
+        let user: User;
+        if (row.details_id) {
+            const userDetails: UserDetails = {
+                userId: row.id,
+                detailsId: row.details_id,
+                firstName: row.first_name,
+                lastName: row.last_name,
+                suburb: row.suburb,
+                zipcode: row.zipcode
+            }
+            user = {
+                id: row.id,
+                facebookId: row.facebook_id,
+                username: row.username,
+                email: row.email,
+                password: row.password,
+                activationToken: row.activationToken,
+                active: row.active,
+                details: userDetails
+            }
+        } else {
+            user = {
+                id: row.id,
+                facebookId: row.facebook_id,
+                username: row.username,
+                email: row.email,
+                password: row.password,
+                activationToken: row.activationToken,
+                active: row.active
+            }
+        }
+        console.log(user);
+        return user;
     }
 
 }

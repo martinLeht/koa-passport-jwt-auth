@@ -91,7 +91,9 @@ export default class UsersController {
 
 
     public async getUsers(ctx: IRouterContext) {
-        const allUsers = await this.usersRepository.findAll();
+        const allUsers: User[] | undefined = await this.usersRepository.findAll();
+        
+        if(!allUsers) ctx.throw(404);
         const users = allUsers.map(({password, activationToken, ...result}) => result);
         ctx.body = {
             users: users
@@ -114,16 +116,13 @@ export default class UsersController {
 
     public async getUserWithDetails(ctx: IRouterContext) {
         const id = parseInt(ctx.params.id);
-        let userWithDetails = await this.usersRepository.findByIdWithDetails(id);
-        
+        let userWithDetails: User | undefined = await this.usersRepository.findByIdWithDetails(id);
         if (!userWithDetails) ctx.throw(404);
 
-        let user: User = Object.assign(new User(), userWithDetails);
-        const userDetails: UserDetails = Object.assign(new UserDetails(), userWithDetails);
-        console.log(user);
-        console.log(userDetails);
+        console.log(userWithDetails);
+        console.log(userWithDetails.details);
 
-        const {password, activationToken, ...resultUser} = user;
+        const {password, activationToken, ...resultUser} = userWithDetails;
         ctx.body = {
             user: resultUser
         };
@@ -167,8 +166,15 @@ export default class UsersController {
             await this.userDetailsRepository.update(user.id, userDetails);
         }
         
+        if (data.email !== undefined) data.email = undefined;
+        if (data.password !== undefined) data.password = undefined;
+        if (data.activationToken !== undefined) data.activationToken = undefined;
+        if (data.active !== undefined) data.active = undefined;
+        if (data.facebookId !== undefined) data.facebookId = undefined;
         await this.usersRepository.update(id, data);
         user = await this.usersRepository.findById(id);
+        
+        if (!user) ctx.throw(404, "User not found!");
 
         const {password, activationToken, ...result} = user;
         console.log("Successfully updated user!");
