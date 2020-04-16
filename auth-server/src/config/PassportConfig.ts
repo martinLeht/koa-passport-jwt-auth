@@ -31,7 +31,7 @@ export default class PassportConfig {
                 session: false,
             }, async (email, password, done) => {
 
-                const user: User = await this.usersRepository.findByEmail(email);
+                const user = await this.usersRepository.findByEmail(email);
 
                 if (!user) {
                     return done(null, false);
@@ -40,7 +40,7 @@ export default class PassportConfig {
                 try {
                     if (await bcryptjs.compare(password, user.password)) {
                         if (user.active) {
-                            if (user.facebook_id) {
+                            if (user.facebookId) {
                                 return done(null, false, { message: "Account is linked with facebook. Login through facebook instead!" });
                             } else {
                                 const {password, ...userData} = user;
@@ -73,6 +73,7 @@ export default class PassportConfig {
         }, async (req: any, accessToken, refreshToken, profile, done) => {
             // Checks if there is a user with the given facebook profile id
             const facebookId = parseInt(profile.id);
+            console.log(facebookId);
             const existingUser = await this.usersRepository.findByFacebookProfile(facebookId);
             if (existingUser) {
                 return done(undefined, existingUser);
@@ -81,14 +82,16 @@ export default class PassportConfig {
             // If there is no user with facebook profile id, check if there is a user with the facebook email
             const existingEmailUser = await this.usersRepository.findByEmail(profile._json.email);
             if (existingEmailUser) {
-                return done(null, false, { message: "There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings." });
+                if (!existingEmailUser.facebookId) {
+                    return done(null, false, { message: "There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings." });
+                }                
             } else { // Registeres an account with the information from facebook profile
                 console.log("Saving fb profile id: " + facebookId);
                 const { email, first_name, last_name } = profile._json;
                 let user: User = new User();
                 user.username = first_name + '.' + last_name;
                 user.email = email;
-                user.facebook_id = facebookId;
+                user.facebookId = facebookId;
                 user.password = await this.helperService.hashPassword("default123");
                 user.active = true;
                 user.activationToken = "";

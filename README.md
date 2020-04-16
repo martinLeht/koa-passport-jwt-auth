@@ -63,32 +63,172 @@ There is also examples of how a valid JSON object should look like when sending
 and what kind of objects are returned.
 
 ### Users
+
+GET Request to get users without details
 ```http
 GET /users/
 ```
+* JSON Response body:
+```json
+{
+    "users": [
+        {
+            "id": 1,
+            "facebookId": null,
+            "username": "sam123",
+            "email": "sam.gamgee@lotr.com",
+            "active": 1
+        },
+        {
+            "id": 9,
+            "facebookId": 123456789123456,
+            "username": "Frodo.baggins",
+            "email": "frodo.baggins@lotr.org",
+            "active": 1
+        }
+    ]
+}
+```
 
-
+GET Request to get user by id
 ```http
 GET /users/1
 ```
+* JSON Response body:
+```json
+{
+    "user": {
+        "id": 1,
+        "facebookId": null,
+        "username": "sam123",
+        "email": "sam.gamgee@lotr.com",
+        "active": 1
+    }
+}
+```
 
+GET Request to get users details with user id
+```http
+GET /users/1/details
+```
+* JSON Response body:
+```json
+{
+    "details": {
+        "userId": 1,
+        "detailsId": 8,
+        "firstName": "Sam",
+        "lastName": "Gamgee",
+        "suburb": "Kazadum",
+        "zipcode": 66611
+    }
+}
+```
+
+GET Request to get user with details by user id
+```http
+GET /users/1/all
+```
+* JSON Response body:
+```json
+{
+    "user": {
+        "id": 1,
+        "facebookId": 123456789123456,
+        "username": "sam123",
+        "email": "sam.gamgee@lotr.com",
+        "active": 1,
+        "details": {
+            "userId": 1,
+            "detailsId": 9,
+            "firstName": "Sam",
+            "lastName": "Gamgee",
+            "suburb": "Kazadum",
+            "zipcode": 66611
+        }
+    }
+}
+```
+
+POST Request to create user
 ```http
 POST /users/
 ```
+* Mandatory data: username, email, password
+* JSON Request body:
+```json
+{
+    "username": "Gimli",
+    "email": "gimli.gloin@lotr.com",
+    "password": "test123"
+}
+```
+* JSON Response body on success:
+```json
+{
+    "success": "Successfully registered! Verify your email to activate your account and log in."
+}
+```
 
-
+PUT Request to update user by id
 ```http
 PUT /users/1
 ```
+* Requires auth
+* Sensitive data cannot be updated through this: email, password, activationToken, active and all ID:s
+* Optional data: username, firstname, lastname, hood, zip
+* JSON Request body:
+```json
+{
+    "username": "GimliDwarf",
+    "firstname": "Gimli",
+    "lastname": "Gloin",
+    "hood": "Moria",
+    "zip": 12345
+}
+```
+* JSON Response body:
+```json
+{
+    "user": {
+        "id": 1,
+        "facebookId": null,
+        "username": "GimliDwarf",
+        "email": "gimli.gloin@lotr.com",
+        "active": 0
+    },
+    "success": "Successfully updated!"
+}
+```
 
-
+DELETE Request to delete user by id
 ```http
 DELETE /users/1
+```
+* Requires auth
+* JSON Response body:
+```json
+{
+    "success": "Successfully deleted your account!"
+}
+```
+
+GET Reqeust to verify users email, user gets token in email message
+```http
+GET /users/1/verify?activationToken=<activationToken>
+```
+* On success sets users field active = 1, activationToken = "".
+  Then redirects to login page (URL hardcoded in USersController acitivateUser() -method)
+* JSON Response body on error:
+```json
+{
+    "error": "Activation tokens did not match!"
+}
 ```
 
 ### Reviews
 
-* GET request to fetch all reviews without the ratings (ratings are only displayed when opening a specific review)
+GET request to fetch all reviews without the ratings (ratings are only displayed when opening a specific review)
 ```http
 GET /reviews/
 ```
@@ -275,7 +415,6 @@ POST /reviews/
 ```
 
 * JSON response body:
-
 ```json
 {
     "review": {
@@ -355,11 +494,10 @@ POST /reviews/
 }
 ```
 
-* Updates a review with id of 2
+PUT Request to update review with id of 2
 ```http
 PUT /reviews/2
 ```
-
 * Mandatory Request data: ratings
 * Optional Request data: title, text
 * JSON Request body:
@@ -533,7 +671,7 @@ PUT /reviews/2
 }
 ```
 
-
+DELETE Request to delete review with id 1
 ```http
 DELETE /reviews/1
 ```
@@ -544,7 +682,6 @@ DELETE /reviews/1
     "success": "Successfully deleted your rating!"
 }
 ```
-
 * When user not found
 ```json
 {
