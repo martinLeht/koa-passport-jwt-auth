@@ -48,10 +48,6 @@ export default class RatingsRepository {
                     obj.value
                 ];
                 let sql = 'INSERT INTO Ratings (review_id, category_id, value) VALUES (?,?,?)';
-                
-                for (let i = 0; i < ratingData.length; i++) {
-                    console.log(ratingData[i]);
-                }
 
                 connection.query(sql, ratingData, (err, result) => {
                     if (err) {
@@ -123,8 +119,6 @@ export default class RatingsRepository {
     }
 
     private parse(row: any): Rating {
-        console.log("IN PARSE");
-        console.log(row);
         const category: Category = {
             categoryId: row.category_id,
             name: row.name

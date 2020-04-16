@@ -351,7 +351,96 @@ GET /reviews/2
 
 GET request to fetch reviews from specific hood
 ```http
-GET /reviews?hood=1
+GET /reviews/hood/1
+```
+* JSON Response body:
+```json
+{
+    "reviews": [
+        {
+            "reviewId": 2,
+            "hoodId": 1,
+            "userId": 7,
+            "title": "Review From Mordor",
+            "text": "One Ring to rule them all, One Ring to find them, One Ring to bring them all and in the darkness bind them!",
+            "verified": 0,
+            "ratings": [
+                {
+                    "ratingId": 9,
+                    "reviewId": 2,
+                    "value": 5,
+                    "category": {
+                        "categoryId": 1,
+                        "name": "safety"
+                    }
+                },
+                {
+                    "ratingId": 10,
+                    "reviewId": 2,
+                    "value": 1,
+                    "category": {
+                        "categoryId": 6,
+                        "name": "services"
+                    }
+                },
+                {
+                    "ratingId": 11,
+                    "reviewId": 2,
+                    "value": 1,
+                    "category": {
+                        "categoryId": 7,
+                        "name": "activities"
+                    }
+                },
+                {
+                    "ratingId": 12,
+                    "reviewId": 2,
+                    "value": 2,
+                    "category": {
+                        "categoryId": 4,
+                        "name": "school"
+                    }
+                },
+                {
+                    "ratingId": 13,
+                    "reviewId": 2,
+                    "value": 1,
+                    "category": {
+                        "categoryId": 8,
+                        "name": "family friendly"
+                    }
+                },
+                {
+                    "ratingId": 14,
+                    "reviewId": 2,
+                    "value": 1,
+                    "category": {
+                        "categoryId": 5,
+                        "name": "transportation"
+                    }
+                },
+                {
+                    "ratingId": 15,
+                    "reviewId": 2,
+                    "value": 4,
+                    "category": {
+                        "categoryId": 2,
+                        "name": "cleanliness"
+                    }
+                },
+                {
+                    "ratingId": 16,
+                    "reviewId": 2,
+                    "value": 3,
+                    "category": {
+                        "categoryId": 3,
+                        "name": "nature"
+                    }
+                }
+            ]
+        }
+    ]
+}
 ```
 
 POST request to create a review entry to database

@@ -24,7 +24,6 @@ export default class ReviewsController {
 
 
     public async getReview(ctx: IRouterContext) {
-        console.log("IN CONTROLLER getReview()")
         const id = parseInt(ctx.params.id);
         let review = await this.reviewsRepository.findById(id);
         
@@ -46,6 +45,16 @@ export default class ReviewsController {
         };
     }
 
+    public async getHoodReviewsWithRatings(ctx: IRouterContext) {
+        const hoodId = parseInt(ctx.params.id);
+
+        const reviews = await this.reviewsRepository.findReviewsForHood(hoodId);
+        if (!reviews) ctx.throw(404, 'No reviews found for hood with id ' + hoodId);
+        ctx.body = {
+            reviews: reviews
+        };
+    }
+
     public async createReview(ctx: IRouterContext) {
         const data = ctx.request.body;
         
@@ -62,7 +71,6 @@ export default class ReviewsController {
         });
         
         const review = await this.reviewsRepository.findReviewWithRatingsById(reviewId);
-        console.log(review);
         if (!review) ctx.throw(404, 'No review found with id ' + reviewId);
 
         ctx.body = {
