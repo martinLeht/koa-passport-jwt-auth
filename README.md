@@ -804,6 +804,7 @@ POST request to login using local strategy
 POST /auth/login
 ```
 * Mandatory data: email, password
+* Returns user with minimal data, newly generated access token with 15min expiration time and refresh token with 1day expiration time
 * JSON Request body:
 ```json
 {
@@ -848,6 +849,7 @@ POST request to generate a new access- and refresh-token
 ```http
 POST /auth/refresh-token
 ```
+* Returns newly generated access token with 15min expiration time and refresh token with 1day expiration time
 * JSON Response body:
 ```json
 {
