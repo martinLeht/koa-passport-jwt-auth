@@ -63,7 +63,7 @@ export default class ReviewsController {
         const reviewId: number = await this.reviewsRepository.insert(data);
         console.log("Inserted review with id " + reviewId);
 
-        if (!data.ratings) ctx.throw(404, 'No ratings for the review in request body!');
+        if (data.ratings === undefined) ctx.throw(404, 'No ratings for the review in request body!');
         const ratings: Rating[] = data.ratings;
         ratings.forEach(async rating => {
             const ratingId = await this.ratingsRepository.insert({ reviewId: reviewId, value: rating.value, categoryId: rating.category.categoryId });
