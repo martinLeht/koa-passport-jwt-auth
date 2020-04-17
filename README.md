@@ -125,6 +125,7 @@ GET Request to get users details with user id
 ```http
 GET /users/1/details
 ```
+* Requires auth
 * JSON Response body:
 ```json
 {
@@ -143,6 +144,7 @@ GET Request to get user with details by user id
 ```http
 GET /users/1/all
 ```
+* Requires auth
 * JSON Response body:
 ```json
 {
@@ -453,6 +455,7 @@ POST request to create a review entry to database
 ```http
 POST /reviews/
 ```
+* Requires auth
 * Mandatory request data: hoodId, userId, title, text, ratings (from all categories)
 * JSON Request body:
 ```json
@@ -606,6 +609,7 @@ PUT Request to update review with id of 2
 ```http
 PUT /reviews/2
 ```
+* Requires auth
 * Mandatory Request data: ratings
 * Optional Request data: title, text
 * JSON Request body:
@@ -783,6 +787,7 @@ DELETE Request to delete review with id 1
 ```http
 DELETE /reviews/1
 ```
+* Requires auth
 * JSON Response body:
 * On Success
 ```json
