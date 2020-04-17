@@ -36,8 +36,6 @@ export default class AuthController {
 
                 const accessToken = this.jwtService.getJwtToken(payload);
                 const refreshToken = await this.jwtService.getRefreshToken(payload);
-                console.log('Access token: ' + accessToken);
-                console.log('Refresh token: ' + refreshToken);
                 console.log("Successfully logged in!");
                 ctx.body = {
                     user: {
@@ -80,8 +78,6 @@ export default class AuthController {
 
                 const accessToken = this.jwtService.getJwtToken(payload);
                 const refreshToken = await this.jwtService.getRefreshToken(payload);
-                console.log('Access token: ' + accessToken);
-                console.log('Refresh token: ' + refreshToken);
                 console.log("Successfully logged in with facebook!");
                 ctx.redirect(CLIENT_URL + '/login?jwt=' + accessToken + '&refreshToken=' + refreshToken + 
                             '&id=' + user.id.toString() + '&username=' + user.username + '&email=' + user.email + '&active=' + true);
