@@ -47,6 +47,12 @@ npm start
 cd auth-server
 npm run start-dev
 ```
+* User will get prompted if the certificate that is being copied to dist is a file or directory, it is a DIRECTORY
+```bash
+Does .\dist\Config\certificates specify a file name
+or directory name on the target
+(F = file, D = directory)? D
+```
 
 
 ### Running Angular Frontend
