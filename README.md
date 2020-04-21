@@ -29,7 +29,7 @@ cd client
 npm install
 ```
 ### Creating SQL Database
-Run SQL queries from `sql/create-user-details.sql`
+Run SQL scripts under `sql/` folder
 
 
 
