@@ -36,6 +36,51 @@ Run SQL queries from `sql/create-user-details.sql`
 
 ### Running Node Server
 
+Before running start commands, you need to create a config.ts file that holds all API-credentials/-keys
+
+Create file Config.ts:
+
+```typescript
+import fs from 'fs';
+
+export const JWT_SECRET = 'testSecret';
+
+export let SECRET = '';
+
+// USE THIS for azure, requires ssl 
+export let dbPoolConfig = {
+    connectionLimit: 5,
+    host: 'XXX.mysql.database.azure.com',
+    user: 'XXX@XXX',
+    password: 'XXX', 
+    database: 'XXX',
+    port: 3306,
+    ssl: {
+        ca : fs.readFileSync(__dirname + '\\certificates\\BaltimoreCyberTrustRoot.crt.pem')
+    }
+};
+
+// Local mysql config
+export let localDbPoolConfig = {
+    connectionLimit: 5,
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'XXX', 
+    database: 'XXX',
+    port: 3308
+};
+
+export const SENDGRID_API_KEY = 'XXX';
+
+export const FACEBOOK_ID = "XXX";
+export const FACEBOOK_SECRET = "XXX";
+export const FACEBOOK_CALLBACK_URL = "XXX";
+
+export const CLIENT_URL = "http://localhost:4200";
+```
+
+Now you should have all environment variables set for a successful server start
+
 ```bash
 cd auth-server
 npm start
