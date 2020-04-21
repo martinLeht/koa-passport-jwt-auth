@@ -38,7 +38,7 @@ Run SQL queries from `sql/create-user-details.sql`
 
 Before running start commands, you need to create a config.ts file that holds all API-credentials/-keys
 
-Create file Config.ts:
+Create file Config.ts under auth-server/src/config:
 
 ```typescript
 import fs from 'fs';
