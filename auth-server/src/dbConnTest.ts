@@ -1,5 +1,4 @@
-import fs from "fs";
-import mysql, { Pool, PoolConfig, MysqlError, PoolConnection, FieldInfo } from 'mysql';
+import mysql, { Pool, MysqlError, PoolConnection, FieldInfo } from 'mysql';
 import { dbPoolConfig } from './config/Config';
 
 const pool: Pool = mysql.createPool(dbPoolConfig);
